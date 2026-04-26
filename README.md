@@ -1,38 +1,34 @@
-# Não Pode Rir
+# No Laughing Allowed
 
-Jogo social para duas pessoas ou times: uma pessoa lê uma piada aleatória, a outra tenta não rir. Se rir, quem leu marca pontos.
+No Laughing Allowed is a party game built for quick rounds, loud reactions, and the impossible challenge of keeping a straight face.
 
-## Estado atual
+One player reads a joke, the other tries not to laugh, and the round turns into a battle between timing, delivery, and self-control. The app supports both local play and connected-device play, so one screen can control the match while another becomes a companion display for the active reader.
 
-Esta base nasceu de um jogo de mímica/desenho e foi adaptada para o formato atual de leitura de piadas. Hoje o app já contempla:
+## What You Can Do
 
-- Rebranding do app para `Não Pode Rir`
-- Introdução de um modelo canônico de conteúdo baseado em `piadas` e `desafios de leitura`
-- Migração compatível do formato antigo de `words/challenges` para o novo domínio
-- Nova partida com modos `times` e `free for all`
-- Fluxo principal de rodada com preparação, leitura e pontuação por riso
-- Conteúdo e expansões voltados para `piadas`, com filtros por categoria e desafios de leitura
-- Tela auxiliar multi-device para alternar entre timer e piada
-- Leaderboard, doações e configurações reaproveitados do projeto original
+- Start a new match in `Teams` mode or `1 vs 1` mode
+- Use a quick game flow to jump into a round faster
+- Play with a companion device that shows the joke or timer during the turn
+- Track rounds, scores, winners, and final results automatically
+- Explore different joke categories and reading challenges
+- Add your own jokes to the library
+- Install extra content packs to expand the experience
+- Browse the all-time leaderboard
+- Adjust language, timer, sound, music, and visual preferences
+- Install the game on supported devices for a more app-like experience
 
-Categorias-base de piadas:
+## Game Flow
 
-- `trocadilhos`
-- `tiozao`
-- `cotidiano`
-- `familia`
-- `escola_trabalho`
-- `absurdo`
+1. Choose the match mode and players.
+2. Pick the joke categories for the session.
+3. Start the round and reveal the joke to the active reader.
+4. Let the other side try not to laugh.
+5. Award points, move to the next turn, and keep the tension going until the final scoreboard.
 
-## Stack
+## Highlights
 
-- `HTML5`
-- `CSS3`
-- `JavaScript` puro
-
-## Rodando localmente
-
-```bash
-npm install
-npm run dev
-```
+- Built around short, replayable rounds
+- Works well for family gatherings, friend groups, and casual party moments
+- Includes a companion-screen experience for more theatrical joke delivery
+- Keeps score for you so the group can focus on the fun
+- Lets the joke library grow over time with custom and expansion content

@@ -1,7 +1,7 @@
 {
-  "name": "Não Pode Rir",
-  "short_name": "NaoPodeRir",
-  "description": "Leia piadas, segure o riso e jogue com amigos, incluindo suporte a multi-dispositivos.",
+  "name": "No Laughing Allowed",
+  "short_name": "NoLaughing",
+  "description": "Read jokes, keep a straight face, and play with friends, including multi-device support.",
   "id": "./",
   "start_url": "./",
   "scope": "./",

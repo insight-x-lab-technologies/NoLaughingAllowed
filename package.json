@@ -1,7 +1,7 @@
 {
-  "name": "nao-pode-rir",
+  "name": "no-laughing-allowed",
   "version": "1.0.0",
-  "description": "Leia piadas, segure o riso e dispute pontos com amigos.",
+  "description": "Read jokes, keep a straight face, and compete with friends.",
   "main": "src/index.html",
   "scripts": {
     "start": "npx serve src",

@@ -6,6 +6,10 @@
     const QUICK_GAME_KEY = 'mm_quick_game_v1';
     const USER_ID_KEY = 'mm_user_id_v1';
     const USER_ID_BACKUP_SCHEMA = 'mimimania.user-id.v1';
+    const MULTI_DEVICE_GUEST_RESUME_KEY = 'mm_multidevice_guest_resume_v1';
+    const MULTI_DEVICE_GUEST_RESUME_TTL_MS = 1000 * 60 * 60 * 12;
+    const MULTI_DEVICE_RECONNECT_MAX_DELAY_MS = 8000;
+    const WAKE_LOCK_ACTIVE_SCREENS = ['multidevice', 'guest', 'setup', 'game', 'score', 'final'];
     const APP_STORAGE_PREFIX = 'mm_';
     const AVAILABLE_THEMES = ['cosmic', 'liquid-glass', 'material3', 'light-mode', 'dark-mode', 'high-contrast'];
     const THEMES_WITH_MUSIC = ['cosmic', 'liquid-glass', 'material3'];
@@ -190,6 +194,8 @@
           guestJokeTurn: 'Sua vez de ler na tela auxiliar.',
           guestScore: 'Aguardando o próximo turno.',
           guestFinal: 'Partida finalizada.',
+          reconnecting: 'Reconectando...',
+          reconnect: 'Reconectar',
           liveDrawing: '📜 Piada na tela auxiliar',
           assignmentTitle: 'Tela auxiliar',
           assignmentLabel: 'Quem usa a tela auxiliar',
@@ -218,7 +224,7 @@
           teamBPlaceholder: 'Nome do Time B',
           playerNamePlaceholder: 'Nome do jogador...',
           teamHelper: '💡 Mínimo 1 por time, máximo 3 por time (até 6 jogadores)',
-          ffaHelper: '💡 Mínimo 3, máximo 6 jogadores',
+          ffaHelper: '💡 Exatamente 2 jogadores',
           difficultyTitle: '4️⃣ Dificuldade',
           difficultyEasyDesc: 'Ótimo para crianças e iniciantes',
           difficultyNormalDesc: 'Desafio equilibrado para a família',
@@ -497,7 +503,8 @@
           maxPlayers: '❌ Máximo 6 jogadores!',
           maxTeamPlayers: '❌ Máximo 3 por time!',
           minTeamPlayers: '❌ Mínimo 1 por time!',
-          minFfaPlayers: '❌ Mínimo 3 jogadores!',
+          minFfaPlayers: '❌ O modo 1 x 1 precisa de exatamente 2 jogadores!',
+          maxFfaPlayers: '❌ O modo 1 x 1 aceita no máximo 2 jogadores!',
           donationLinkUnavailable: '⚠️ Configure o link de doação deste parceiro para ativá-lo.',
           shareCopied: '🔗 Link copiado!',
           shareUnavailable: '🔗 Link copiado para compartilhar.',
@@ -634,6 +641,8 @@
           guestJokeTurn: 'Your turn to read on the companion screen.',
           guestScore: 'Waiting for the next turn.',
           guestFinal: 'Game finished.',
+          reconnecting: 'Reconnecting...',
+          reconnect: 'Reconnect',
           liveDrawing: '📜 Joke on the companion screen',
           assignmentTitle: 'Companion screen',
           assignmentLabel: 'Who uses the companion screen',
@@ -662,7 +671,7 @@
           teamBPlaceholder: 'Team B name',
           playerNamePlaceholder: 'Player name...',
           teamHelper: '💡 Minimum 1 per team, maximum 3 per team (up to 6 players)',
-          ffaHelper: '💡 Minimum 3, maximum 6 players',
+          ffaHelper: '💡 Exactly 2 players',
           difficultyTitle: '4️⃣ Difficulty',
           difficultyEasyDesc: 'Great for kids and beginners',
           difficultyNormalDesc: 'Balanced fun for the whole family',
@@ -941,7 +950,8 @@
           maxPlayers: '❌ Maximum 6 players!',
           maxTeamPlayers: '❌ Maximum 3 per team!',
           minTeamPlayers: '❌ At least 1 per team!',
-          minFfaPlayers: '❌ At least 3 players!',
+          minFfaPlayers: '❌ 1 vs 1 mode needs exactly 2 players!',
+          maxFfaPlayers: '❌ 1 vs 1 mode allows at most 2 players!',
           donationLinkUnavailable: '⚠️ Configure this partner donation link to enable it.',
           shareCopied: '🔗 Link copied!',
           shareUnavailable: '🔗 Link copied for sharing.',
@@ -1097,12 +1107,12 @@
           modeFfaName: 'Todos contra todos',
           modeFfaDesc: 'Cada quien por su cuenta',
           teamPlayersTitle: '3️⃣ Jugadores por Equipo',
-          playersTitle: '3️⃣ Jugadores',
+          playersTitle: '2️⃣ Jugadores',
           teamAPlaceholder: 'Nombre del Equipo A',
           teamBPlaceholder: 'Nombre del Equipo B',
           playerNamePlaceholder: 'Nombre del jugador...',
           teamHelper: '💡 Mínimo 1 por equipo, máximo 3 por equipo (hasta 6 jugadores)',
-          ffaHelper: '💡 Mínimo 3, máximo 6 jugadores',
+          ffaHelper: '💡 Exactamente 2 jugadores',
           difficultyTitle: '4️⃣ Dificultad',
           difficultyEasyDesc: 'Ideal para niños y principiantes',
           difficultyNormalDesc: 'Desafío equilibrado para la familia',
@@ -1363,7 +1373,8 @@
           maxPlayers: '❌ ¡Máximo 6 jugadores!',
           maxTeamPlayers: '❌ ¡Máximo 3 por equipo!',
           minTeamPlayers: '❌ ¡Mínimo 1 por equipo!',
-          minFfaPlayers: '❌ ¡Mínimo 3 jugadores!',
+          minFfaPlayers: '❌ ¡El modo 1 vs 1 necesita exactamente 2 jugadores!',
+          maxFfaPlayers: '❌ ¡El modo 1 vs 1 admite como máximo 2 jugadores!',
           donationLinkUnavailable: '⚠️ Configura el enlace de donación de este socio para activarlo.',
           shareCopied: '🔗 ¡Enlace copiado!',
           shareUnavailable: '🔗 Enlace copiado para compartir.',
@@ -1524,12 +1535,12 @@
         modeFfaName: 'Chacun pour soi',
         modeFfaDesc: 'Tous contre tous',
         teamPlayersTitle: '3️⃣ Joueurs par équipe',
-        playersTitle: '3️⃣ Joueurs',
+        playersTitle: '2️⃣ Joueurs',
         teamAPlaceholder: 'Nom de l’équipe A',
         teamBPlaceholder: 'Nom de l’équipe B',
         playerNamePlaceholder: 'Nom du joueur...',
         teamHelper: '💡 Minimum 1 par équipe, maximum 3 par équipe (jusqu’à 6 joueurs)',
-        ffaHelper: '💡 Minimum 3, maximum 6 joueurs',
+        ffaHelper: '💡 Exactement 2 joueurs',
         difficultyTitle: '4️⃣ Difficulté',
         difficultyEasyDesc: 'Idéal pour les enfants et débutants',
         difficultyNormalDesc: 'Défi équilibré pour toute la famille',
@@ -1762,7 +1773,8 @@
         maxPlayers: '❌ Maximum 6 joueurs !',
         maxTeamPlayers: '❌ Maximum 3 par équipe !',
         minTeamPlayers: '❌ Minimum 1 par équipe !',
-        minFfaPlayers: '❌ Minimum 3 joueurs !',
+        minFfaPlayers: '❌ Le mode 1 contre 1 exige exactement 2 joueurs !',
+        maxFfaPlayers: '❌ Le mode 1 contre 1 accepte au maximum 2 joueurs !',
         donationLinkUnavailable: '⚠️ Configurez le lien de don de ce partenaire pour l’activer.',
         shareCopied: '🔗 Lien copié !',
         shareUnavailable: '🔗 Lien copié pour partager.',
@@ -1906,12 +1918,12 @@
         modeFfaName: 'Jeder gegen jeden',
         modeFfaDesc: 'Alle gegen alle',
         teamPlayersTitle: '3️⃣ Spieler pro Team',
-        playersTitle: '3️⃣ Spieler',
+        playersTitle: '2️⃣ Spieler',
         teamAPlaceholder: 'Name von Team A',
         teamBPlaceholder: 'Name von Team B',
         playerNamePlaceholder: 'Spielername...',
         teamHelper: '💡 Mindestens 1 pro Team, höchstens 3 pro Team (bis zu 6 Spieler)',
-        ffaHelper: '💡 Mindestens 3, höchstens 6 Spieler',
+        ffaHelper: '💡 Genau 2 Spieler',
         difficultyTitle: '4️⃣ Schwierigkeit',
         difficultyEasyDesc: 'Ideal für Kinder und Anfänger',
         difficultyNormalDesc: 'Ausgewogene Herausforderung für die Familie',
@@ -2144,7 +2156,8 @@
         maxPlayers: '❌ Maximal 6 Spieler!',
         maxTeamPlayers: '❌ Maximal 3 pro Team!',
         minTeamPlayers: '❌ Mindestens 1 pro Team!',
-        minFfaPlayers: '❌ Mindestens 3 Spieler!',
+        minFfaPlayers: '❌ Der 1-gegen-1-Modus braucht genau 2 Spieler!',
+        maxFfaPlayers: '❌ Der 1-gegen-1-Modus erlaubt höchstens 2 Spieler!',
         donationLinkUnavailable: '⚠️ Konfiguriere den Spendenlink dieses Partners, um ihn zu aktivieren.',
         shareCopied: '🔗 Link kopiert!',
         shareUnavailable: '🔗 Link zum Teilen kopiert.',
@@ -2288,12 +2301,12 @@
         modeFfaName: 'Tutti contro tutti',
         modeFfaDesc: 'Ognuno per sé',
         teamPlayersTitle: '3️⃣ Giocatori per squadra',
-        playersTitle: '3️⃣ Giocatori',
+        playersTitle: '2️⃣ Giocatori',
         teamAPlaceholder: 'Nome squadra A',
         teamBPlaceholder: 'Nome squadra B',
         playerNamePlaceholder: 'Nome giocatore...',
         teamHelper: '💡 Minimo 1 per squadra, massimo 3 per squadra (fino a 6 giocatori)',
-        ffaHelper: '💡 Minimo 3, massimo 6 giocatori',
+        ffaHelper: '💡 Esattamente 2 giocatori',
         difficultyTitle: '4️⃣ Difficoltà',
         difficultyEasyDesc: 'Ottimo per bambini e principianti',
         difficultyNormalDesc: 'Sfida equilibrata per tutta la famiglia',
@@ -2526,7 +2539,8 @@
         maxPlayers: '❌ Massimo 6 giocatori!',
         maxTeamPlayers: '❌ Massimo 3 per squadra!',
         minTeamPlayers: '❌ Minimo 1 per squadra!',
-        minFfaPlayers: '❌ Minimo 3 giocatori!',
+        minFfaPlayers: '❌ La modalità 1 contro 1 richiede esattamente 2 giocatori!',
+        maxFfaPlayers: '❌ La modalità 1 contro 1 accetta al massimo 2 giocatori!',
         donationLinkUnavailable: '⚠️ Configura il link di donazione di questo partner per attivarlo.',
         shareCopied: '🔗 Link copiato!',
         shareUnavailable: '🔗 Link copiato per la condivisione.',
@@ -2707,31 +2721,56 @@
     const DEFAULT_JOKES_PT = {
       trocadilhos: [
         'Por que o calendário ficou nervoso? Porque os dias dele estavam contados.',
-        'O peixe foi ao médico. O doutor disse: nada de preocupações.',
-        'A impressora foi ao psicólogo porque estava cheia de papelada emocional.',
-        'O café brigou com o açúcar porque a relação estava muito amarga.',
-        'A lâmpada terminou o namoro porque precisava de um tempo para clarear as ideias.',
-        'O pão entrou na academia para ficar com o miolo definido.',
-        'O relógio foi demitido porque só fazia hora extra.',
-        'A nuvem abriu uma empresa, mas faliu por falta de chuva de ideias.',
-        'O lápis pediu férias porque estava sem ponta para lidar com tudo.',
-        'O espelho não foi à festa porque não se vê nessas situações.',
-        'A bateria da banda saiu primeiro porque estava sem energia social.',
-        'O elevador ficou triste porque vivia tendo altos e baixos.',
-        'O sapato virou coach e agora só fala em dar passos firmes.',
-        'A escada ficou famosa porque sempre soube subir na vida.',
-        'O garfo terminou o curso porque finalmente encontrou seu ponto.',
-        'O chão pediu respeito porque estava sendo passado para trás.',
-        'A toalha foi promovida porque secava qualquer problema.',
-        'O travesseiro abriu consultório porque entende de casos pesados.',
-        'A tomada terminou o namoro porque a conexão não era mais a mesma.',
-        'O bolo foi ao terapeuta porque tinha muitas camadas.',
-        'A mochila ficou ofendida porque sempre jogavam tudo nas costas dela.',
-        'A abelha ficou rica porque sabia fazer render o negócio.',
-        'O botão pediu demissão porque vivia sob pressão.',
-        'A panela fez amizade com o fogo porque a relação esquentou rápido.',
-        'O chinelo perdeu a discussão porque não tinha sola para argumentar.',
-        'A borracha ficou confusa porque tentava apagar o passado.'
+        'Por que o peixe foi ao médico? Porque o doutor mandou ele ficar com nada de preocupações.',
+        'Por que a impressora foi ao psicólogo? Porque estava cheia de papelada emocional.',
+        'Por que o café brigou com o açúcar? Porque a relação estava muito amarga.',
+        'Por que a lâmpada terminou o namoro? Porque precisava de um tempo para clarear as ideias.',
+        'Por que o pão entrou na academia? Porque queria ficar com o miolo definido.',
+        'Por que o relógio foi demitido? Porque só fazia hora extra.',
+        'Por que a nuvem abriu uma empresa? Porque queria fazer chover ideias.',
+        'Por que o lápis pediu férias? Porque estava sem ponta para lidar com tudo.',
+        'Por que o espelho não foi à festa? Porque não se vê nessas situações.',
+        'Por que a bateria da banda saiu primeiro? Porque estava sem energia social.',
+        'Por que o elevador ficou triste? Porque vivia tendo altos e baixos.',
+        'Por que o sapato virou coach? Porque só sabia falar em dar passos firmes.',
+        'Por que a escada ficou famosa? Porque sempre soube subir na vida.',
+        'Por que o garfo terminou o curso? Porque finalmente encontrou seu ponto.',
+        'Por que o chão pediu respeito? Porque estava sendo passado para trás.',
+        'Por que a toalha foi promovida? Porque secava qualquer problema.',
+        'Por que o travesseiro abriu consultório? Porque entende de casos pesados.',
+        'Por que a tomada terminou o namoro? Porque a conexão não era mais a mesma.',
+        'Por que o bolo foi ao terapeuta? Porque tinha muitas camadas.',
+        'Por que a mochila ficou ofendida? Porque sempre jogavam tudo nas costas dela.',
+        'Por que a abelha ficou rica? Porque sabia fazer render o negócio.',
+        'Por que o botão pediu demissão? Porque vivia sob pressão.',
+        'Por que a panela fez amizade com o fogo? Porque a relação esquentou rápido.',
+        'Por que o chinelo perdeu a discussão? Porque não tinha sola para argumentar.',
+        'Por que a borracha ficou confusa? Porque tentava apagar o passado.',
+        'Por que o caderno virou terapeuta? Porque sabia ouvir uma folha inteira de problemas.',
+        'Por que a tesoura foi promovida? Porque cortava caminho sem perder a classe.',
+        'Por que a caneca se sentiu importante? Porque sempre carregava o café nas costas.',
+        'Por que o ventilador virou cantor? Porque adorava soltar refrão no ar.',
+        'Por que a janela ficou corada? Porque ouviu a conversa e ficou sem vidro na cara.',
+        'Por que o guarda-chuva abriu falência? Porque só lucrava em tempo fechado.',
+        'Por que a meia foi ao encontro? Porque queria achar seu par ideal.',
+        'Por que o teclado se estressou? Porque tinha muita tecla para apertar.',
+        'Por que o sofá não discutia? Porque preferia deixar tudo mais macio.',
+        'Por que a geladeira era boa conselheira? Porque sempre ajudava a esfriar a cabeça.',
+        'Por que o liquidificador foi expulso da festa? Porque só sabia bater papo.',
+        'Por que o copo foi ao dentista? Porque estava com uma rachadura no sorriso.',
+        'Por que a régua era respeitada? Porque colocava limites em qualquer assunto.',
+        'Por que o abajur era otimista? Porque vivia procurando um lado mais claro.',
+        'Por que a vassoura ficou solteira? Porque varria todo mundo da vida dela.',
+        'Por que o parafuso se deu bem no trabalho? Porque se encaixava em qualquer projeto.',
+        'Por que a almofada virou influenciadora? Porque sabia apoiar todas as causas.',
+        'Por que o microfone não guardava segredo? Porque sempre amplificava tudo.',
+        'Por que a agenda se emocionou? Porque tinha muitos compromissos com o futuro.',
+        'Por que o cabide era tão confiante? Porque sustentava qualquer look.',
+        'Por que o sabonete evitava fofoca? Porque não queria se meter em roupa suja.',
+        'Por que o tapete era zen? Porque já estava acostumado a ser pisado e seguir firme.',
+        'Por que a colher foi contratada? Porque mexia com a equipe inteira.',
+        'Por que o capacete era tão centrado? Porque protegia bem as próprias ideias.',
+        'Por que a lata contou piada? Porque queria descontrair o ambiente.'
       ],
       tiozao: [
         'Qual é o café mais perigoso do mundo? O ex-presso.',
@@ -2759,119 +2798,144 @@
         'O que a vaca foi fazer no espaço? Procurar o vácuo.',
         'Qual é a ferramenta que se acha? O alicate.',
         'Por que a laranja atendeu o telefone? Porque era uma chamada a cobrar.',
-        'O que o milho falou para a pipoca? Você anda tão estourada.'
+        'O que o milho falou para a pipoca? Você anda tão estourada.',
+        'Qual é o contrário de volátil? Vem cá sobrinho.',
+        'O que o pneu falou para o carro? Estou redondo de tanto rodar com você.',
+        'Por que o lápis não se perdeu? Porque tinha um bom ponto de vista.',
+        'Qual é o exame favorito do pão? A ressonância de miolo.',
+        'O que a banana suicida falou? Macacos me mordam.',
+        'Por que o jacaré tirou o filho da escola? Porque ele réptil de ano.',
+        'Qual é o carro que cabe no bolso? O Fiat uno de cada vez.',
+        'O que a impressora falou para o papel? Essa relação vai dar impressão.',
+        'Por que o relógio foi preso? Porque matou o tempo.',
+        'Qual é o cereal mais brincalhão? O arroz zoto.',
+        'O que a chave falou para a fechadura? Nossa relação sempre abre portas.',
+        'Por que a bola foi ao dentista? Porque estava com a rede cheia de buracos.',
+        'Qual é o cúmulo da economia? Usar o outro lado do palito de dente.',
+        'O que o pato disse para a pata? Vem quá.',
+        'Por que o sorvete não usa elevador? Porque prefere uma sobremesa mais gelada.',
+        'Qual é o nome da filha do japonês que caiu da bicicleta? Jaspiona.',
+        'O que o café disse para o leite? Sem você eu não funciono direito.',
+        'Por que a bicicleta não levantou da cama? Porque estava duas-tirada.',
+        'Qual é o peixe que adora academia? O salmão maromba.',
+        'O que o arroz falou para o feijão? Se gruda em mim que hoje tem química.',
+        'Por que o fantasma entrou na dieta? Porque estava de corpo presente demais.',
+        'Qual é a ave que mais reclama? O urubu-mingão do trânsito.',
+        'O que a cebola disse para o cozinheiro? Se me cortar, você chora.',
+        'Por que o shampoo foi ao bar? Porque queria uma saideira com condicionador.',
+        'Qual é o doce mais educado? O bombom dia.'
       ],
       cotidiano: [
-        'Entrei na cozinha de madrugada tão silencioso que até a geladeira sussurrou: pega logo e vai embora.',
-        'O boleto venceu, olhou para mim e falou: hoje eu ganho essa discussão.',
-        'Cheguei cedo na fila, mas a senhora atrás de mim já estava agindo como se tivesse fundado o lugar.',
-        'Fui tão produtivo no home office que cansei só de abrir e fechar abas para parecer ocupado.',
-        'O despertador tocou, eu negociei cinco minutos e perdi a reunião inteira.',
-        'Abri a câmera da call sem querer e virei o evento principal do setor.',
-        'A pia acumulou tanta louça que já podia abrir um museu de copos sujos.',
-        'No mercado, eu fui comprar pão e voltei com tudo, menos o pão.',
-        'Meu Wi-Fi cai sempre no meio da frase, como se também tivesse preguiça de terminar assunto.',
-        'A senha do prédio é tão grande que eu já entro cansado antes do elevador.',
-        'O grupo da família manda bom dia com tanta força que parece reunião de firma.',
-        'Tentei dobrar roupa assistindo série e acabei com spoiler e camiseta torta.',
-        'Meu navegador tem quarenta abas abertas e nenhuma delas resolve minha vida.',
-        'A cadeira do escritório range tanto que participa da reunião mais do que eu.',
-        'Fui procurar uma meia e achei três potes sem tampa, dois cabos e zero meias.',
-        'A fila do caixa rápido tinha tanta compra que só faltava vender o próprio mercado.',
-        'O ônibus chegou cheio, olhou para mim e falou: hoje não vai dar.',
-        'Entrei na farmácia por causa de uma dor e saí com shampoo, bala e promoção de vitamina.',
-        'Minha lista de tarefas já virou lista de testemunhas do que eu não fiz.',
-        'Fui esquentar café no micro-ondas e esqueci o café lá até a próxima era geológica.',
-        'Quando tocam no interfone, eu já atendo com voz de quem não pediu nada.',
-        'Minha geladeira faz um barulho de madrugada que parece estar ensaiando solo de bateria.',
-        'Passei pano na casa inteira e cinco minutos depois alguém entrou com areia emocional.',
-        'No elevador, todo mundo finge que o espelho não existe e posa mesmo assim.',
-        'A busca pela tampa certa do pote é o escape room oficial da cozinha.',
-        'Abri o aplicativo do banco só para confirmar que continuo humilde.'
+        'Por que a geladeira sussurrou de madrugada? Porque eu entrei tão silencioso na cozinha que ela só faltou dizer pega logo e vai embora.',
+        'Por que o boleto parecia confiante? Porque venceu e achou que tinha ganhado a discussão.',
+        'Por que a fila ficou engraçada? Porque a pessoa atrás de mim já agia como se tivesse fundado o lugar.',
+        'Por que o home office me cansou tanto? Porque abri e fechei abas demais só para parecer ocupado.',
+        'Por que perdi a reunião inteira? Porque negociei cinco minutos a mais com o despertador.',
+        'Por que virei o evento principal da call? Porque abri a câmera sem querer.',
+        'Por que a pia merecia virar museu? Porque acumulou copos sujos o suficiente para uma exposição.',
+        'Por que a ida ao mercado deu errado? Porque comprei tudo, menos o pão.',
+        'Por que meu Wi-Fi parece preguiçoso? Porque sempre cai no meio da frase.',
+        'Por que eu já entro cansado no prédio? Porque a senha é quase um vestibular.',
+        'Por que o grupo da família parece firma? Porque o bom dia chega com força de reunião obrigatória.',
+        'Por que dobrar roupa vendo série não funciona? Porque eu termino com spoiler e camiseta torta.',
+        'Por que meu navegador parece depósito? Porque tem quarenta abas e nenhuma resolve minha vida.',
+        'Por que a cadeira do escritório participa da reunião? Porque range mais do que eu falo.',
+        'Por que procurar meia em casa é aventura? Porque sempre acho potes, cabos e nenhuma meia.',
+        'Por que o caixa rápido era irônico? Porque só faltava vender o mercado inteiro de tanta compra na fila.',
+        'Por que o ônibus me rejeitou? Porque chegou lotado com cara de hoje não vai dar.',
+        'Por que saí da farmácia com compras aleatórias? Porque entrei por causa de dor e saí com shampoo, bala e vitamina.',
+        'Por que minha lista de tarefas assusta? Porque já virou documento oficial do que eu não fiz.',
+        'Por que o café ficou famoso no micro-ondas? Porque ficou esquecido lá por uma era geológica.',
+        'Por que atendo o interfone desconfiado? Porque quase nunca fui eu quem pediu alguma coisa.',
+        'Por que a geladeira parece baterista? Porque ensaia solo de madrugada.',
+        'Por que o chão perde a dignidade rápido? Porque basta eu passar pano para alguém entrar com areia emocional.',
+        'Por que o elevador parece ensaio fotográfico? Porque todo mundo finge que ignora o espelho enquanto posa.',
+        'Por que achar a tampa certa do pote parece jogo? Porque a cozinha tem um escape room próprio.',
+        'Por que abro o aplicativo do banco com cuidado? Porque ele sempre confirma que continuo humilde.'
       ],
       familia: [
-        'Minha mãe não disse que estava brava. Ela só falou meu nome completo com CEP e coordenadas.',
-        'Em toda família existe alguém que diz que vai só experimentar a comida e encerra metade da travessa.',
-        'Meu primo disse que não ronca. A casa toda ouviu essa mentira dormindo.',
-        'Na reunião de família, sempre aparece um tio que faz pergunta de entrevista de emprego no almoço.',
-        'Casal feliz é aquele que divide tudo, inclusive a culpa do controle remoto sumido.',
-        'A avó pediu segredo e contou a mesma fofoca em três grupos diferentes da família.',
-        'Meu pai não pede informação na rua porque prefere errar com convicção.',
-        'Toda família tem um especialista em churrasco que nunca segura a própria carne.',
-        'Minha tia chega para almoçar e já abre a panela como se tivesse passe VIP na cozinha.',
-        'Casal que monta móvel junto descobre o amor e o limite da paciência no mesmo manual.',
-        'Meu irmão some o dia inteiro, mas aparece no segundo exato em que a comida fica pronta.',
-        'A criança da família sempre encontra o único lugar barulhento da casa às sete da manhã.',
-        'Meu avô conta a mesma história em todo almoço, mas muda o final para ver se a gente nota.',
-        'Minha mãe pergunta se estou com fome já servindo o segundo prato.',
-        'Toda discussão em grupo de família termina com figurinha, áudio longo e alguém saindo do grupo.',
-        'No namoro, a frase vamos conversar nunca vem para elogiar a decoração.',
-        'Meu sobrinho pede para brincar cinco minutos e devolve a sala em estado de reforma.',
-        'A sogra disse que não quer atrapalhar e já mandou cinco sugestões antes do café.',
-        'Meu pai diz que vai só olhar o jogo e narra cada lance para a rua inteira.',
-        'Toda família tem alguém que traz pote vazio para voltar com comida.',
-        'Minha irmã pede roupa emprestada e devolve dizendo que já veio assim.',
-        'Em visita de parente, o sofá trabalha em escala máxima e sem adicional.',
-        'Meu primo prometeu chegar cedo e trouxe consigo o conceito totalmente flexível de cedo.',
-        'Casal em mercado é teste de compatibilidade com preço de sabonete.',
-        'Minha mãe avisa que não quer bagunça justamente quando resolve arrumar tudo ao mesmo tempo.',
-        'A avó oferece comida com tanta insistência que recusar parece crime federal.'
+        'Como eu sei que minha mãe ficou brava? Porque ela falou meu nome completo com CEP e coordenadas.',
+        'Por que toda família precisa vigiar a travessa? Porque sempre tem alguém que vai só experimentar e encerra metade dela.',
+        'Por que ninguém acreditou no meu primo? Porque ele jurou que não ronca enquanto a casa inteira ouvia.',
+        'Por que almoço de família parece entrevista? Porque sempre aparece um tio com perguntas sobre carreira e futuro.',
+        'O que define um casal feliz? Dividir tudo, inclusive a culpa pelo controle remoto sumido.',
+        'Por que não dá para contar segredo para a avó? Porque ela repassa a fofoca em três grupos diferentes.',
+        'Por que meu pai não pede informação? Porque prefere errar com convicção.',
+        'Por que todo churrasco tem um especialista folclórico? Porque ele orienta todo mundo, menos a própria carne.',
+        'Por que minha tia parece ter acesso VIP? Porque chega para almoçar já abrindo a panela.',
+        'O que casal descobre montando móvel junto? O amor e o limite da paciência no mesmo manual.',
+        'Por que meu irmão é radar de comida? Porque some o dia inteiro e aparece no segundo exato em que a panela termina.',
+        'Por que a criança da família vence qualquer silêncio? Porque encontra o único lugar barulhento da casa às sete da manhã.',
+        'Por que o almoço do meu avô nunca é igual? Porque ele conta a mesma história trocando o final para testar a plateia.',
+        'Como minha mãe pergunta se estou com fome? Já servindo o segundo prato.',
+        'Como termina uma discussão no grupo da família? Com figurinha, áudio longo e alguém saindo dramaticamente.',
+        'O que significa a frase vamos conversar no namoro? Que não vem elogio para a decoração.',
+        'Por que brincar cinco minutos com meu sobrinho assusta? Porque a sala volta em estado de reforma.',
+        'Como a sogra ajuda sem atrapalhar? Mandando cinco sugestões antes do café.',
+        'Por que meu pai não assiste jogo em silêncio? Porque narra cada lance para a rua inteira.',
+        'Por que todo encontro de família precisa de pote? Porque sempre tem alguém levando vazio para voltar cheio.',
+        'Como minha irmã devolve roupa emprestada? Dizendo que ela já veio assim.',
+        'Por que o sofá sofre quando chegam parentes? Porque entra em escala máxima e sem adicional.',
+        'O que significa chegar cedo para o meu primo? Um conceito completamente flexível.',
+        'Por que casal em mercado é prova de compatibilidade? Porque o preço do sabonete revela caráter.',
+        'Por que minha mãe fala que não quer bagunça? Porque é exatamente quando resolve arrumar tudo ao mesmo tempo.',
+        'Por que recusar comida da avó parece crime? Porque ela oferece com insistência de decreto federal.'
       ],
       escola_trabalho: [
-        'O aluno estudou tanto para a prova que, na hora H, esqueceu até o próprio nome em silêncio acadêmico.',
-        'Na reunião, todo mundo concordou com a ideia só porque ninguém queria ser o responsável por entender o slide.',
-        'Meu chefe pediu algo simples, rápido e perfeito. Eu quase pedi um milagre por escrito.',
-        'A professora disse que a prova estava fácil. Fácil para quem escreveu, talvez.',
-        'No trabalho, o e-mail mais rápido do mundo é aquele que começa com urgente e termina com ninguém sabe resolver.',
-        'O grupo do seminário tinha quatro pessoas: duas sumidas, uma opinando e eu descobrindo o tema no dia.',
-        'A impressora da escola só trava quando o prazo está olhando diretamente para você.',
-        'Meu currículo diz proativo; meu corpo diz cochilo depois do almoço.',
-        'A aula começou às sete, mas meu cérebro pediu acesso só às oito e meia.',
-        'Na firma, a frase reunião rápida costuma durar o tempo de uma novela curta.',
-        'O professor falou consulta liberada, e metade da sala abriu o olho brilhando mais que a apostila.',
-        'Meu estágio me ensinou muita coisa, principalmente a parecer calmo no caos.',
-        'Toda apresentação tem um slide que ninguém entende, mas todo mundo respeita.',
-        'A caneta sempre falha no formulário mais importante do universo.',
-        'Meu chefe manda mensagem com pode ser rapidinho e eu já sinto a agenda chorando.',
-        'Na escola, o apagador sempre some justamente quando a lousa vira mural abstrato.',
-        'Cheguei na reunião tão cedo que participei até do silêncio constrangedor antes do bom dia.',
-        'Meu notebook decidiu atualizar bem no minuto em que eu finalmente sabia o que dizer.',
-        'A prova de múltipla escolha às vezes parece teste de intuição com figurino de ciência.',
-        'No escritório, a impressora reconhece medo e se alimenta dele.',
-        'O aluno faltou o semestre inteiro e apareceu no dia do trabalho em grupo com voz de liderança.',
-        'O café do trabalho une equipes que nenhum treinamento conseguiu aproximar.',
-        'O professor disse que a atividade é em dupla e a sala inteira virou aplicativo de procura.',
-        'Meu crachá já abre menos porta do que minha cara de desespero.',
-        'Toda call tem alguém falando no mudo e alguém com cachorro promovido a coapresentador.',
-        'A planilha ficou tão complexa que já exigia licença poética para ser entendida.'
+        'Por que o aluno ficou em branco na prova? Porque estudou tanto que esqueceu até o próprio nome na hora H.',
+        'Por que todo mundo concordou na reunião? Porque ninguém queria assumir que não entendeu o slide.',
+        'Por que quase pedi milagre por escrito ao chefe? Porque ele queria algo simples, rápido e perfeito.',
+        'Por que a prova parecia fácil só no discurso? Porque era fácil para quem escreveu.',
+        'Qual é o e-mail mais rápido do trabalho? Aquele que começa com urgente e termina com ninguém sabe resolver.',
+        'Como era meu grupo do seminário? Duas pessoas sumidas, uma opinando e eu descobrindo o tema no dia.',
+        'Por que a impressora da escola escolhe o caos? Porque só trava quando o prazo está olhando para você.',
+        'O que meu currículo diz e meu corpo responde? O currículo diz proativo e o corpo diz cochilo depois do almoço.',
+        'Por que a aula das sete não entra no cérebro? Porque minha mente só pede acesso às oito e meia.',
+        'Quanto dura uma reunião rápida na firma? Mais ou menos o tempo de uma novela curta.',
+        'O que acontece quando o professor fala consulta liberada? Metade da sala acende mais do que a apostila.',
+        'O que o estágio mais me ensinou? A parecer calmo no meio do caos.',
+        'Qual é a regra universal das apresentações? Sempre existe um slide que ninguém entende, mas todo mundo respeita.',
+        'Por que a caneta falha no pior momento? Porque ela gosta de emoção em formulário importante.',
+        'Por que a agenda chora quando o chefe escreve rapidinho? Porque todo mundo sabe que não vai ser rapidinho.',
+        'Por que o apagador desaparece na escola? Porque some justo quando a lousa vira arte abstrata.',
+        'Por que eu cheguei cedo demais na reunião? Porque participei até do silêncio constrangedor antes do bom dia.',
+        'Por que o notebook atualizou na pior hora? Porque foi bem quando eu finalmente sabia o que dizer.',
+        'O que a prova de múltipla escolha parece às vezes? Um teste de intuição vestido de ciência.',
+        'Por que a impressora do escritório mete medo? Porque reconhece pânico e se alimenta dele.',
+        'Por que o aluno ausente vira líder no trabalho em grupo? Porque ele aparece no dia final com voz de autoridade.',
+        'O que une equipes no trabalho mais do que treinamento? O café da copa.',
+        'O que acontece quando o professor fala atividade em dupla? A sala inteira vira aplicativo de procura.',
+        'Por que meu crachá já não impressiona? Porque minha cara de desespero abre mais portas.',
+        'Qual é a lei de toda call? Sempre tem alguém falando no mudo e alguém com cachorro coapresentador.',
+        'Por que a planilha parecia literatura experimental? Porque já precisava de licença poética para ser entendida.'
       ],
       absurdo: [
-        'O pombo abriu uma startup de migalhas premium e agora só pousa em praça com investidor.',
-        'Ontem vi uma batata filosofando sobre o sentido da fritura enquanto esperava o óleo esquentar.',
-        'Um dinossauro apareceu no elevador e pediu desculpa pelo atraso do meteoro anterior.',
-        'A cadeira pediu férias porque estava cansada de sustentar decisões ruins.',
-        'O travesseiro fez greve porque ninguém respeita o horário comercial dos sonhos.',
-        'O guarda-chuva se recusou a sair de casa porque a previsão era de sol com chance de drama.',
-        'Uma torradeira abriu curso de autoestima para pães inseguros.',
-        'O abacaxi virou detetive porque já estava acostumado com situações espinhosas.',
-        'Um jacaré apareceu de terno e pediu desconto em parcelas para comprar uma bicicleta aquática.',
-        'A lua faltou ao céu porque estava fazendo home office em outro fuso.',
-        'O sorvete fundou um sindicato contra calçadas quentes e ameaças de verão.',
-        'A gelatina tentou correr, mas descobriu que nasceu para tremer diante dos desafios.',
-        'Um guarda-roupa escreveu memórias sobre tudo o que viu atrás das portas.',
-        'O chinelo sonha em ser avião, mas por enquanto só faz conexão com o pé.',
-        'Uma cebola foi eleita prefeita da salada e começou a governar por camadas.',
-        'O liquidificador largou tudo para seguir carreira solo em música eletrônica.',
-        'A colher se apaixonou por um cometa e agora mexe estrelas no café.',
-        'O sofá tirou carteira de piloto porque já estava cansado de voos da imaginação.',
-        'A formiga montou um mezanino no açúcar e cobrou aluguel em migalhas.',
-        'O poste adotou um vaga-lume porque queria apoio na iluminação da noite.',
-        'A torrada deu entrevista dizendo que o segredo do sucesso é aceitar a pressão do fogo.',
-        'Um peixinho abriu agência de turismo para poças emocionadas.',
-        'A nuvem comprou patins para fazer chuva com mais estilo.',
-        'O caracol prometeu entregar a mensagem até terça de algum ano.',
-        'Uma meia perdida fundou uma república independente dentro da máquina de lavar.',
-        'O tomate entrou para o teatro experimental e agora só atua em saladas existenciais.'
+        'Por que o pombo abriu uma startup? Porque queria vender migalhas premium para investidores de praça.',
+        'Por que a batata estava filosofando? Porque queria entender o sentido da fritura antes do óleo esquentar.',
+        'Por que o dinossauro pediu desculpa no elevador? Porque disse que o atraso vinha do meteoro anterior.',
+        'Por que a cadeira pediu férias? Porque estava cansada de sustentar decisões ruins.',
+        'Por que o travesseiro fez greve? Porque ninguém respeitava o horário comercial dos sonhos.',
+        'Por que o guarda-chuva não quis sair? Porque a previsão era de sol com chance de drama.',
+        'Por que a torradeira abriu curso de autoestima? Porque queria ajudar pães inseguros.',
+        'Por que o abacaxi virou detetive? Porque já estava acostumado com situações espinhosas.',
+        'Por que o jacaré apareceu de terno? Porque queria desconto para comprar uma bicicleta aquática.',
+        'Por que a lua faltou ao céu? Porque estava em home office em outro fuso.',
+        'Por que o sorvete fundou um sindicato? Porque queria lutar contra calçadas quentes e ameaças de verão.',
+        'Por que a gelatina desistiu da corrida? Porque descobriu que nasceu para tremer diante dos desafios.',
+        'Por que o guarda-roupa escreveu memórias? Porque tinha muitas histórias atrás das portas.',
+        'Por que o chinelo queria ser avião? Porque sonhava ir além da conexão com o pé.',
+        'Por que a cebola foi eleita prefeita da salada? Porque governava tudo por camadas.',
+        'Por que o liquidificador largou tudo? Porque foi seguir carreira solo em música eletrônica.',
+        'Por que a colher se apaixonou por um cometa? Porque queria mexer estrelas no café.',
+        'Por que o sofá tirou carteira de piloto? Porque se cansou dos voos da imaginação.',
+        'Por que a formiga cobrou aluguel no açúcar? Porque montou um mezanino ali.',
+        'Por que o poste adotou um vaga-lume? Porque queria apoio na iluminação da noite.',
+        'Qual é o segredo do sucesso da torrada? Aceitar a pressão do fogo.',
+        'Por que o peixinho abriu agência de turismo? Porque viu potencial em poças emocionadas.',
+        'Por que a nuvem comprou patins? Porque queria fazer chuva com mais estilo.',
+        'Quando o caracol prometeu entregar a mensagem? Até terça de algum ano.',
+        'Por que a meia perdida fundou uma república? Porque cansou de viver exilada na máquina de lavar.',
+        'Por que o tomate entrou para o teatro experimental? Porque só queria atuar em saladas existenciais.'
       ]
     };
 
@@ -4666,7 +4730,12 @@
       connections: [],
       assignment: '',
       sessionUrl: '',
-      lastPayload: null
+      lastPayload: null,
+      wakeLock: null,
+      guestReconnectTimer: 0,
+      guestReconnectAttempt: 0,
+      hostRecoveryTimer: 0,
+      hostRecoveryAttempt: 0
     };
     const musicState = {
       audio: null,
@@ -4811,6 +4880,7 @@
       }
       updateBackgroundMusic();
       resetViewportToTop(nextScreen);
+      syncWakeLock(`screen-${screen}`);
     }
 
     function getFullscreenElement() {
@@ -4882,10 +4952,100 @@
     }
 
     // ============================================================
+    // WAKE LOCK
+    // ============================================================
+    function shouldKeepScreenAwake() {
+      const activeScreen = document.body.dataset.activeScreen || 'home';
+      if (!WAKE_LOCK_ACTIVE_SCREENS.includes(activeScreen)) return false;
+      if (activeScreen === 'guest') return true;
+      if (activeScreen === 'multidevice') return multiDeviceState.role !== 'single';
+      if (multiDeviceState.role === 'host') return true;
+      return Boolean(gameState.players.length && gameState.totalTurns);
+    }
+
+    async function releaseWakeLock() {
+      const sentinel = multiDeviceState.wakeLock;
+      multiDeviceState.wakeLock = null;
+      if (!sentinel) return;
+      try {
+        await sentinel.release();
+      } catch (e) { }
+    }
+
+    async function requestWakeLock(reason = 'screen-change') {
+      if (!('wakeLock' in navigator) || document.hidden || !shouldKeepScreenAwake()) return;
+      if (multiDeviceState.wakeLock && multiDeviceState.wakeLock.released === false) return;
+
+      try {
+        const sentinel = await navigator.wakeLock.request('screen');
+        multiDeviceState.wakeLock = sentinel;
+        sentinel.addEventListener('release', () => {
+          if (multiDeviceState.wakeLock === sentinel) multiDeviceState.wakeLock = null;
+          if (!document.hidden && shouldKeepScreenAwake()) {
+            requestAnimationFrame(() => requestWakeLock(`${reason}-released`));
+          }
+        });
+      } catch (e) { }
+    }
+
+    function syncWakeLock(reason = 'screen-change') {
+      if (document.hidden || !shouldKeepScreenAwake()) {
+        releaseWakeLock();
+        return;
+      }
+      requestWakeLock(reason);
+    }
+
+    // ============================================================
     // MULTI DEVICE
     // ============================================================
     function isPeerAvailable() {
       return typeof window.Peer === 'function';
+    }
+
+    function saveGuestReconnectTarget(hostId) {
+      if (!hostId) return;
+      try {
+        localStorage.setItem(MULTI_DEVICE_GUEST_RESUME_KEY, JSON.stringify({
+          hostId,
+          savedAt: Date.now()
+        }));
+      } catch (e) { }
+    }
+
+    function loadGuestReconnectTarget() {
+      try {
+        const raw = localStorage.getItem(MULTI_DEVICE_GUEST_RESUME_KEY);
+        if (!raw) return '';
+        const parsed = JSON.parse(raw);
+        const hostId = extractSessionCode(parsed?.hostId || '');
+        const savedAt = Number(parsed?.savedAt) || 0;
+        if (!hostId || !savedAt || (Date.now() - savedAt) > MULTI_DEVICE_GUEST_RESUME_TTL_MS) {
+          localStorage.removeItem(MULTI_DEVICE_GUEST_RESUME_KEY);
+          return '';
+        }
+        return hostId;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function clearGuestReconnectTarget() {
+      try {
+        localStorage.removeItem(MULTI_DEVICE_GUEST_RESUME_KEY);
+      } catch (e) { }
+    }
+
+    function clearGuestReconnectTimer() {
+      if (!multiDeviceState.guestReconnectTimer) return;
+      window.clearTimeout(multiDeviceState.guestReconnectTimer);
+      multiDeviceState.guestReconnectTimer = 0;
+    }
+
+    function clearHostRecoveryTimer() {
+      if (!multiDeviceState.hostRecoveryTimer) return;
+      window.clearTimeout(multiDeviceState.hostRecoveryTimer);
+      multiDeviceState.hostRecoveryTimer = 0;
     }
 
     function setJoinStatus(keyOrText) {
@@ -4910,6 +5070,13 @@
           : 'multiDevice.connecting';
       el.textContent = t(statusKey);
       el.dataset.connectionStatus = multiDeviceState.guestConnectionStatus;
+      const reconnectButton = document.getElementById('guest-reconnect-button');
+      if (reconnectButton) {
+        const shouldShowReconnect = multiDeviceState.role === 'guest'
+          && multiDeviceState.guestConnectionStatus === 'disconnected'
+          && Boolean(multiDeviceState.hostPeerId);
+        reconnectButton.classList.toggle('hidden', !shouldShowReconnect);
+      }
     }
 
     function setGuestConnectionStatus(status) {
@@ -4962,12 +5129,17 @@
       renderCompanionAssignmentControl();
     }
 
-    function closeCurrentPeer() {
+    function closeCurrentPeer(options = {}) {
+      const { nextRole = 'single', keepLastPayload = false } = options;
+      const preservedLastPayload = keepLastPayload ? multiDeviceState.lastPayload : null;
+      clearGuestReconnectTimer();
+      clearHostRecoveryTimer();
       try {
         multiDeviceState.connections.forEach(conn => conn.close?.());
         multiDeviceState.hostConnection?.close?.();
         multiDeviceState.peer?.destroy?.();
       } catch (e) { }
+      multiDeviceState.role = nextRole;
       multiDeviceState.peer = null;
       multiDeviceState.hostConnection = null;
       multiDeviceState.guestConnectionStatus = 'disconnected';
@@ -4976,8 +5148,10 @@
       multiDeviceState.peerId = '';
       multiDeviceState.hostPeerId = '';
       multiDeviceState.sessionUrl = '';
-      multiDeviceState.lastPayload = null;
+      multiDeviceState.lastPayload = preservedLastPayload;
       renderMultiDeviceHomeSummary();
+      renderGuestConnectionStatus();
+      syncWakeLock('peer-closed');
     }
 
     function isCurrentPeerOpen() {
@@ -5016,7 +5190,7 @@
       document.getElementById('multidevice-session-code').textContent = multiDeviceState.peerId;
       document.getElementById('multidevice-link').value = multiDeviceState.sessionUrl;
       renderSessionQRCode(multiDeviceState.sessionUrl);
-      setHostStatus('multiDevice.hostReady');
+      setHostStatus(isHostSessionOpen() ? 'multiDevice.hostReady' : 'multiDevice.reconnecting');
       updateHostGuestCount();
     }
 
@@ -5025,7 +5199,9 @@
       const input = document.getElementById('multidevice-join-code');
       const hostCode = multiDeviceState.hostPeerId || multiDeviceState.hostConnection?.peer || '';
       if (input) input.value = hostCode;
-      setJoinStatus('multiDevice.connected');
+      setJoinStatus(multiDeviceState.guestConnectionStatus === 'connected'
+        ? 'multiDevice.connected'
+        : 'multiDevice.reconnecting');
     }
 
     function restoreMultiDeviceScreenState() {
@@ -5033,7 +5209,15 @@
         showExistingHostSession();
         return;
       }
+      if (multiDeviceState.role === 'host' && multiDeviceState.peerId) {
+        showExistingHostSession();
+        return;
+      }
       if (isGuestSessionOpen()) {
+        showExistingGuestSession();
+        return;
+      }
+      if (multiDeviceState.role === 'guest' && multiDeviceState.hostPeerId) {
         showExistingGuestSession();
         return;
       }
@@ -5041,8 +5225,9 @@
     }
 
     function disconnectGuestSession() {
+      clearGuestReconnectTarget();
+      multiDeviceState.guestReconnectAttempt = 0;
       closeCurrentPeer();
-      multiDeviceState.role = 'single';
       setGuestConnectionStatus('disconnected');
       document.getElementById('guest-round-title').textContent = t('multiDevice.waitingTitle');
       document.getElementById('guest-current-player-label').textContent = t('multiDevice.guestWaiting');
@@ -5052,6 +5237,30 @@
       document.body.dataset.guestGameType = 'mime';
       updateGuestTimerDisplay(NaN, 1);
       goTo('home');
+    }
+
+    function scheduleGuestReconnect(reason = 'connection-lost') {
+      if (multiDeviceState.role !== 'guest' || !multiDeviceState.hostPeerId) return;
+      clearGuestReconnectTimer();
+      setJoinStatus('multiDevice.reconnecting');
+      const delay = Math.min(1000 * (multiDeviceState.guestReconnectAttempt + 1), MULTI_DEVICE_RECONNECT_MAX_DELAY_MS);
+      multiDeviceState.guestReconnectTimer = window.setTimeout(() => {
+        connectToMultiDeviceHost(multiDeviceState.hostPeerId, { isAutoReconnect: true, reason });
+      }, delay);
+    }
+
+    function scheduleHostRecovery(reason = 'connection-lost') {
+      if (multiDeviceState.role !== 'host' || !multiDeviceState.peerId) return;
+      clearHostRecoveryTimer();
+      setHostStatus('multiDevice.reconnecting');
+      const delay = Math.min(1000 * (multiDeviceState.hostRecoveryAttempt + 1), MULTI_DEVICE_RECONNECT_MAX_DELAY_MS);
+      multiDeviceState.hostRecoveryTimer = window.setTimeout(() => {
+        createMultiDeviceHost({
+          preferredPeerId: multiDeviceState.peerId,
+          isRecovery: true,
+          reason
+        });
+      }, delay);
     }
 
     function sendToGuest(conn, message) {
@@ -5156,21 +5365,29 @@
       setTimeout(syncGuest, 200);
     }
 
-    function createMultiDeviceHost() {
+    function createMultiDeviceHost(options = {}) {
+      const { preferredPeerId = '', isRecovery = false } = options;
       if (!isPeerAvailable()) {
         showNotif(t('multiDevice.peerUnavailable'), 'var(--accent1)', 'var(--btn-danger-text)');
         return;
       }
 
-      closeCurrentPeer();
-      multiDeviceState.role = 'host';
+      const previousPeerId = preferredPeerId || multiDeviceState.peerId;
+      const previousSessionUrl = previousPeerId ? getSessionUrl(previousPeerId) : multiDeviceState.sessionUrl;
+      closeCurrentPeer({ nextRole: 'host' });
+      multiDeviceState.peerId = previousPeerId || '';
+      multiDeviceState.sessionUrl = previousSessionUrl || '';
       document.getElementById('multidevice-host-panel')?.classList.remove('hidden');
-      setHostStatus('multiDevice.hostCreating');
+      setHostStatus(isRecovery ? 'multiDevice.reconnecting' : 'multiDevice.hostCreating');
       updateHostGuestCount();
+      syncWakeLock('host-session-start');
 
-      const peer = new window.Peer();
+      const peer = previousPeerId ? new window.Peer(previousPeerId) : new window.Peer();
       multiDeviceState.peer = peer;
       peer.on('open', id => {
+        if (multiDeviceState.peer !== peer) return;
+        clearHostRecoveryTimer();
+        multiDeviceState.hostRecoveryAttempt = 0;
         multiDeviceState.peerId = id;
         multiDeviceState.sessionUrl = getSessionUrl(id);
         document.getElementById('multidevice-session-code').textContent = id;
@@ -5180,15 +5397,42 @@
         renderMultiDeviceHomeSummary();
         broadcastHostGameState();
       });
-      peer.on('connection', attachHostConnection);
-      peer.on('error', () => {
-        setHostStatus('multiDevice.hostError');
+      peer.on('connection', conn => {
+        if (multiDeviceState.peer !== peer) {
+          try {
+            conn.close?.();
+          } catch (e) { }
+          return;
+        }
+        attachHostConnection(conn);
+      });
+      peer.on('disconnected', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'host') return;
+        multiDeviceState.hostRecoveryAttempt += 1;
         renderMultiDeviceHomeSummary();
+        scheduleHostRecovery('peer-disconnected');
+      });
+      peer.on('close', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'host') return;
+        multiDeviceState.hostRecoveryAttempt += 1;
+        renderMultiDeviceHomeSummary();
+        scheduleHostRecovery('peer-closed');
+      });
+      peer.on('error', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'host') return;
+        multiDeviceState.hostRecoveryAttempt += 1;
+        renderMultiDeviceHomeSummary();
+        if (isRecovery) {
+          scheduleHostRecovery('peer-error');
+          return;
+        }
+        setHostStatus('multiDevice.hostError');
         showNotif(t('multiDevice.hostError'), 'var(--accent1)', 'var(--btn-danger-text)');
       });
     }
 
-    function connectToMultiDeviceHost(rawCode) {
+    function connectToMultiDeviceHost(rawCode, options = {}) {
+      const { isAutoReconnect = false } = options;
       const hostId = extractSessionCode(rawCode);
       if (!hostId) {
         setJoinStatus('multiDevice.missingSession');
@@ -5200,29 +5444,56 @@
         return;
       }
 
-      closeCurrentPeer();
-      multiDeviceState.role = 'guest';
+      if (multiDeviceState.role === 'guest' && multiDeviceState.hostPeerId === hostId && isGuestSessionOpen()) {
+        sendToGuest(multiDeviceState.hostConnection, { type: 'guest-ready' });
+        return;
+      }
+
+      closeCurrentPeer({ nextRole: 'guest', keepLastPayload: isAutoReconnect });
       multiDeviceState.hostPeerId = hostId;
-      setJoinStatus('multiDevice.connecting');
+      multiDeviceState.guestReconnectAttempt = isAutoReconnect ? multiDeviceState.guestReconnectAttempt : 0;
+      saveGuestReconnectTarget(hostId);
+      setJoinStatus(isAutoReconnect ? 'multiDevice.reconnecting' : 'multiDevice.connecting');
       setGuestConnectionStatus('connecting');
-      goTo('guest');
+      syncWakeLock('guest-session-start');
+      if (!document.getElementById('screen-guest')?.classList.contains('active')) goTo('guest');
 
       const peer = new window.Peer();
       multiDeviceState.peer = peer;
       peer.on('open', () => {
+        if (multiDeviceState.peer !== peer) return;
         const conn = peer.connect(hostId, { reliable: true });
         multiDeviceState.hostConnection = conn;
         attachGuestConnection(conn);
       });
-      peer.on('error', () => {
+      peer.on('disconnected', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'guest') return;
         setGuestConnectionStatus('disconnected');
-        setJoinStatus('multiDevice.hostError');
         renderMultiDeviceHomeSummary();
+        multiDeviceState.guestReconnectAttempt += 1;
+        scheduleGuestReconnect('peer-disconnected');
+      });
+      peer.on('close', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'guest') return;
+        setGuestConnectionStatus('disconnected');
+        renderMultiDeviceHomeSummary();
+        multiDeviceState.guestReconnectAttempt += 1;
+        scheduleGuestReconnect('peer-closed');
+      });
+      peer.on('error', () => {
+        if (multiDeviceState.peer !== peer || multiDeviceState.role !== 'guest') return;
+        setGuestConnectionStatus('disconnected');
+        renderMultiDeviceHomeSummary();
+        multiDeviceState.guestReconnectAttempt += 1;
+        scheduleGuestReconnect('peer-error');
       });
     }
 
     function attachGuestConnection(conn) {
       conn.on('open', () => {
+        if (multiDeviceState.hostConnection !== conn) return;
+        clearGuestReconnectTimer();
+        multiDeviceState.guestReconnectAttempt = 0;
         setGuestConnectionStatus('connected');
         setJoinStatus('multiDevice.connected');
         renderMultiDeviceHomeSummary();
@@ -5230,12 +5501,20 @@
       });
       conn.on('data', handleGuestMessage);
       conn.on('close', () => {
+        if (multiDeviceState.hostConnection !== conn) return;
+        multiDeviceState.hostConnection = null;
         setGuestConnectionStatus('disconnected');
         renderMultiDeviceHomeSummary();
+        multiDeviceState.guestReconnectAttempt += 1;
+        scheduleGuestReconnect('connection-closed');
       });
       conn.on('error', () => {
+        if (multiDeviceState.hostConnection !== conn) return;
+        multiDeviceState.hostConnection = null;
         setGuestConnectionStatus('disconnected');
         renderMultiDeviceHomeSummary();
+        multiDeviceState.guestReconnectAttempt += 1;
+        scheduleGuestReconnect('connection-error');
       });
     }
 
@@ -5397,12 +5676,43 @@
     }
 
     function initializeMultiDeviceJoinFromUrl() {
-      const code = new URL(window.location.href).searchParams.get('join');
+      const urlCode = new URL(window.location.href).searchParams.get('join');
+      const savedCode = loadGuestReconnectTarget();
+      const code = urlCode || savedCode;
       if (!code) return;
       const input = document.getElementById('multidevice-join-code');
       if (input) input.value = code;
       selectMultiDeviceMode('join');
-      connectToMultiDeviceHost(code);
+      connectToMultiDeviceHost(code, { isAutoReconnect: Boolean(savedCode && !urlCode) });
+    }
+
+    function refreshMultiDevicePresence(reason = 'resume') {
+      if (multiDeviceState.role === 'guest') {
+        if (isGuestSessionOpen()) {
+          clearGuestReconnectTimer();
+          sendToGuest(multiDeviceState.hostConnection, { type: 'guest-ready' });
+          return;
+        }
+        if (multiDeviceState.hostPeerId) {
+          connectToMultiDeviceHost(multiDeviceState.hostPeerId, { isAutoReconnect: true, reason });
+        }
+        return;
+      }
+
+      if (multiDeviceState.role === 'host') {
+        if (isHostSessionOpen()) {
+          clearHostRecoveryTimer();
+          broadcastHostGameState();
+          return;
+        }
+        if (multiDeviceState.peerId) {
+          createMultiDeviceHost({
+            preferredPeerId: multiDeviceState.peerId,
+            isRecovery: true,
+            reason
+          });
+        }
+      }
     }
 
     function getThemeVar(name) {
@@ -6128,7 +6438,7 @@
           gameState.teams = clone(data.teams);
           if (data.teamNames) gameState.teamNames = { ...data.teamNames };
         } else if (mode === 'ffa' && data.players) {
-          gameState.players = [...data.players];
+          gameState.players = [...data.players].slice(0, 2);
         }
       } catch (e) { }
     }
@@ -6409,8 +6719,8 @@
       const name = inp.value.trim();
       if (!name) return;
       if (!gameState.players) gameState.players = [];
-      if (gameState.players.length >= 6) {
-        showNotif(t('notifications.maxPlayers'), 'var(--accent1)', 'var(--btn-danger-text)');
+      if (gameState.players.length >= 2) {
+        showNotif(t('notifications.maxFfaPlayers'), 'var(--accent1)', 'var(--btn-danger-text)');
         return;
       }
       gameState.players.push(name);
@@ -6437,7 +6747,7 @@
         B: Array.isArray(config?.teams?.B) ? config.teams.B.map(name => String(name).trim()).filter(Boolean).slice(0, 3) : []
       };
       const players = Array.isArray(config?.players)
-        ? config.players.map(name => String(name).trim()).filter(Boolean).slice(0, 6)
+        ? config.players.map(name => String(name).trim()).filter(Boolean).slice(0, 2)
         : [];
       return {
         gameType,
@@ -6479,7 +6789,7 @@
         randomChallenge: false,
         selectedCategories: getDefaultSelectedCategories(),
         teams: { A: [], B: [] },
-        players: [1, 2, 3, 4].map(number => getDefaultPlayerName(number)),
+        players: [1, 2].map(number => getDefaultPlayerName(number)),
         teamNames: {
           A: getDefaultTeamName('A'),
           B: getDefaultTeamName('B')
@@ -6547,7 +6857,7 @@
         teamA.forEach(player => { gameState.scores[player] = 0; });
         teamB.forEach(player => { gameState.scores[player] = 0; });
       } else {
-        if (!gameState.players || gameState.players.length < 3) {
+        if (!gameState.players || gameState.players.length !== 2) {
           showNotif(t('notifications.minFfaPlayers'), 'var(--accent1)', 'var(--btn-danger-text)');
           return;
         }
@@ -8055,6 +8365,10 @@
         animateButtonClick(button);
         return disconnectGuestSession();
       }
+      if (action === 'reconnect-multidevice-guest') {
+        animateButtonClick(button);
+        return connectToMultiDeviceHost(multiDeviceState.hostPeerId || document.getElementById('multidevice-join-code')?.value || '', { isAutoReconnect: true });
+      }
       if (action === 'donate-bmc') {
         animateButtonClick(button);
         return openDonationLink('buyMeCoffee');
@@ -8235,6 +8549,18 @@
       });
       document.addEventListener('fullscreenchange', updateFullscreenButton);
       document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+      document.addEventListener('visibilitychange', () => {
+        syncWakeLock('visibilitychange');
+        if (!document.hidden) refreshMultiDevicePresence('visibilitychange');
+      });
+      window.addEventListener('pageshow', () => {
+        syncWakeLock('pageshow');
+        refreshMultiDevicePresence('pageshow');
+      });
+      window.addEventListener('online', () => {
+        syncWakeLock('online');
+        refreshMultiDevicePresence('online');
+      });
       window.addEventListener('beforeinstallprompt', event => {
         event.preventDefault();
         deferredPWAInstallPrompt = event;
