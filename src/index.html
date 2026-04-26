@@ -46,23 +46,6 @@
       </button>
       <h1 class="logo" data-i18n="home.title">Não Pode Rir</h1>
       <p class="logo-sub" data-i18n="home.subtitle">Leia piadas, segure o riso e vença a rodada</p>
-      <!--
-      <div class="dev-preview-panel mb">
-        <div class="dev-preview-copy">
-          <div class="eyebrow eyebrow-accent" data-i18n="dev.mode">Modo de desenvolvimento</div>
-          <div class="text-sm" data-i18n="dev.description">Teste rapidamente o layout em mobile, tablet e desktop.</div>
-        </div>
-        <div class="dev-preview-field">
-          <label class="text-strong text-sm-title" for="dev-layout-preview" data-i18n="dev.previewLabel">Prévia de layout</label>
-          <select id="dev-layout-preview" class="inp dev-preview-select">
-            <option value="auto" data-i18n="dev.preview.auto">Auto</option>
-            <option value="mobile" data-i18n="dev.preview.mobile">Mobile</option>
-            <option value="tablet" data-i18n="dev.preview.tablet">Tablet</option>
-            <option value="desktop" data-i18n="dev.preview.desktop">Desktop</option>
-          </select>
-        </div>
-      </div>
-      -->
       <div class="home-grid">
         <div class="card home-card home-actions-card">
           <div class="flex-col home-actions">
@@ -342,7 +325,7 @@
                 <div class="toggle-sub" id="random-challenge-sub" data-i18n="setup.randomChallengeSub">Adiciona modificadores à mímica</div>
               </div>
               <label class="toggle">
-                <input type="checkbox" id="random-challenge-toggle">
+                <input type="checkbox" id="random-challenge-toggle" checked>
                 <span class="toggle-slider"></span>
               </label>
             </div>
@@ -404,9 +387,9 @@
       <div id="memorize-state" class="hidden">
         <div class="center mb-sm">
           <div class="eyebrow eyebrow-accent mb-xs" data-i18n="game.memorizeTitle">
-            ⚡ Prepare a leitura!
+            ⚡ Prepare-se!
           </div>
-          <div class="text-meta" data-i18n="game.startsIn">A leitura começa em...</div>
+          <div class="text-meta" data-i18n="game.startsIn">A piada aparece em...</div>
         </div>
         <div class="action-row action-row-center mb">
           <div class="countdown-wrap">
@@ -415,17 +398,11 @@
               <circle id="memCircle" cx="40" cy="40" r="34" fill="none" stroke="#c77dff" stroke-width="6"
                 stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="0" class="countdown-progress" />
             </svg>
-            <div id="mem-num" class="countdown-number">5</div>
+            <div id="mem-num" class="countdown-number">3</div>
           </div>
         </div>
-        <div class="word-card word-card-memorize">
-          <div class="word-text word-text-memorize" id="mem-word-display">---</div>
-          <div id="mem-challenge-display" class="challenge-text hidden">
-            <span data-i18n="game.challengePrefix">🎯 Desafio:</span> <span id="mem-challenge-text">---</span>
-          </div>
-          <div class="eyebrow eyebrow-muted mt-xs" id="game-only-actor-can-see" data-i18n="game.onlyMimeCanSee">
-            Só o mimo pode ver!
-          </div>
+        <div class="text-sm center text-muted" data-i18n="game.readySub">
+          Só quem vai ler deve olhar! Os outros fechem os olhos! 👀
         </div>
       </div>
 
@@ -646,14 +623,24 @@
           </div>
           <div class="toggle-wrap">
             <div>
-              <label class="toggle-label" for="correct-points-input" data-i18n="settings.correctPointsLabel">Pontos por acerto</label>
+              <div class="toggle-label" data-i18n="settings.prepareTimeLabel">Tempo de Preparação</div>
+              <div class="toggle-sub" data-i18n="settings.prepareTimeSub">Segundos antes da piada aparecer</div>
+            </div>
+            <div class="range-wrap range-wrap-fixed">
+              <input type="range" class="range-inp" id="prepare-timer-slider" min="1" max="10" step="1" value="3">
+              <div class="range-val" id="prepare-timer-val">3s</div>
+            </div>
+          </div>
+          <div class="toggle-wrap">
+            <div>
+              <label class="toggle-label" for="correct-points-input" data-i18n="settings.correctPointsLabel">Pontos por risada</label>
               <div class="toggle-sub" data-i18n="settings.correctPointsSub">Pontos para quem faz o outro lado rir</div>
             </div>
             <input class="inp points-input" id="correct-points-input" type="number" min="0" max="999" step="1" value="10">
           </div>
           <div class="toggle-wrap">
             <div>
-              <label class="toggle-label" for="wrong-points-input" data-i18n="settings.wrongPenaltyPointsLabel">Pontos perdidos por erro</label>
+              <label class="toggle-label" for="wrong-points-input" data-i18n="settings.wrongPenaltyPointsLabel">Pontos perdidos por não rir</label>
               <div class="toggle-sub" data-i18n="settings.wrongPenaltyPointsSub">Desconta pontos quando ninguém ri ou o tempo acaba</div>
             </div>
             <input class="inp points-input" id="wrong-points-input" type="number" min="0" max="999" step="1" value="0">
@@ -866,7 +853,7 @@
     </div>
 
     <footer class="site-footer">
-      <span data-i18n="footer.copyPrefix">© 2025 Não Pode Rir v6.1 · Insight X Lab Technologies</span>
+      <span data-i18n="footer.copyPrefix">© 2025 Não Pode Rir v0.1 · Insight X Lab Technologies</span>
     </footer>
   </div>
 

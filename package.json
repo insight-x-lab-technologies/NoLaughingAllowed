@@ -1,6 +1,6 @@
 {
   "name": "no-laughing-allowed",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Read jokes, keep a straight face, and compete with friends.",
   "main": "src/index.html",
   "scripts": {

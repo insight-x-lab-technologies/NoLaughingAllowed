@@ -1,16 +1,18 @@
     const DEFAULT_LANGUAGE = 'pt';
-    const SETTINGS_KEY = 'mm_settings_v2';
-    const CONTENT_KEY = 'mm_content_v1';
-    const LEADERBOARD_KEY = 'mm_leaderboard_v1';
-    const LEGACY_WORDS_KEY = 'mm_words_v2';
-    const QUICK_GAME_KEY = 'mm_quick_game_v1';
-    const USER_ID_KEY = 'mm_user_id_v1';
-    const USER_ID_BACKUP_SCHEMA = 'mimimania.user-id.v1';
-    const MULTI_DEVICE_GUEST_RESUME_KEY = 'mm_multidevice_guest_resume_v1';
+    const SETTINGS_KEY = 'npr_settings_v1';
+    const CONTENT_KEY = 'npr_content_v1';
+    const LEADERBOARD_KEY = 'npr_leaderboard_v1';
+    const LEGACY_WORDS_KEY = 'npr_words_v1';
+    const QUICK_GAME_KEY = 'npr_quick_game_v1';
+    const USER_ID_KEY = 'npr_user_id_v1';
+    const USER_ID_BACKUP_SCHEMA = 'naopoderir.user-id.v1';
+    const MULTI_DEVICE_GUEST_RESUME_KEY = 'npr_multidevice_guest_resume_v1';
     const MULTI_DEVICE_GUEST_RESUME_TTL_MS = 1000 * 60 * 60 * 12;
     const MULTI_DEVICE_RECONNECT_MAX_DELAY_MS = 8000;
     const WAKE_LOCK_ACTIVE_SCREENS = ['multidevice', 'guest', 'setup', 'game', 'score', 'final'];
-    const APP_STORAGE_PREFIX = 'mm_';
+    const LAST_TEAMS_KEY = 'npr_last_teams';
+    const LAST_FFA_KEY = 'npr_last_ffa';
+    const APP_STORAGE_PREFIX = 'npr_';
     const AVAILABLE_THEMES = ['cosmic', 'liquid-glass', 'material3', 'light-mode', 'dark-mode', 'high-contrast'];
     const THEMES_WITH_MUSIC = ['cosmic', 'liquid-glass', 'material3'];
     const THEME_MUSIC_PREFIX = {
@@ -25,7 +27,6 @@
     const MUSIC_ASSET_BASE = './assets/songs';
     const SUPPORTED_LANGUAGES = ['pt', 'en'];
     const LANGUAGE_HTML_MAP = { pt: 'pt-BR', en: 'en', es: 'es', fr: 'fr', de: 'de', it: 'it' };
-    const GAME_TYPES = ['mime', 'drawing'];
     const LEADERBOARD_MODE_KEYS = ['mimeTeams', 'mimeFfa', 'drawingTeams', 'drawingFfa'];
     const LEADERBOARD_PAGE_SIZE = 10;
     const LEADERBOARD_DEFAULT_AVATAR = './assets/player-default.svg';
@@ -40,10 +41,8 @@
       escola_trabalho: '📚',
       absurdo: '🤪'
     };
-    const DIFFICULTY_ICONS = { easy: '🌱', normal: '⚡', hard: '🔥' };
     const DEFAULT_CORRECT_POINTS = 10;
     const DEFAULT_WRONG_PENALTY_POINTS = 0;
-    const DEFAULT_FFA_GUESSER_POINTS = 5;
     const CORE_PACK_ID = 'core-default';
     const WORD_PACK_SCHEMA = 'naopoderir.jokepack.v1';
     const PACK_SIGNATURE_ALGORITHM = 'ECDSA_P256_SHA256';
@@ -75,10 +74,10 @@
     }
 
     function generateUserId() {
-      if (crypto?.randomUUID) return `mmu_${crypto.randomUUID()}`;
+      if (crypto?.randomUUID) return `npru_${crypto.randomUUID()}`;
       const bytes = new Uint8Array(16);
       crypto.getRandomValues(bytes);
-      return `mmu_${Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')}`;
+      return `npru_${Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')}`;
     }
 
     function getOrCreateUserId() {
@@ -188,8 +187,8 @@
           connected: 'Conectado',
           disconnected: 'Desconectado',
           guestWaiting: 'Aguardando o host iniciar a partida.',
-          guestPreparing: 'Aguardando a piada ser preparada.',
-          guestMemorizing: 'A rodada vai começar.',
+          guestPreparing: 'Aguardando o host preparar a rodada.',
+          guestMemorizing: 'Prepare-se! A piada aparece em instantes.',
           guestPlaying: 'Segurem o riso!',
           guestJokeTurn: 'Sua vez de ler na tela auxiliar.',
           guestScore: 'Aguardando o próximo turno.',
@@ -262,8 +261,8 @@
           readySub: 'Só quem vai ler deve olhar! Os outros fechem os olhos! 👀',
           readyDrawingSub: 'Só quem vai ler no device auxiliar deve olhar! Os outros fechem os olhos! 👀',
           revealWord: '🎲 Sortear Piada',
-          memorizeTitle: '⚡ Prepare a leitura!',
-          startsIn: 'A leitura começa em...',
+          memorizeTitle: '⚡ Prepare-se!',
+          startsIn: 'A piada aparece em...',
           onlyMimeCanSee: 'Só quem vai ler pode ver!',
           onlyDrawerCanSee: 'Só o leitor do device auxiliar pode ver!',
           secondsLabel: 'SEGUNDOS',
@@ -387,11 +386,13 @@
           timerTitle: '⏱️ Timer',
           roundTimeLabel: 'Tempo por Rodada',
           roundTimeSub: 'Segundos para ler a piada',
+          prepareTimeLabel: 'Tempo de Preparação',
+          prepareTimeSub: 'Segundos antes da piada aparecer',
           penaltyLabel: 'Penalidade por Skip',
           penaltySub: '−10 pontos ao pular',
-          correctPointsLabel: 'Pontos por acerto',
+          correctPointsLabel: 'Pontos por risada',
           correctPointsSub: 'Pontos para quem faz o outro lado rir',
-          wrongPenaltyPointsLabel: 'Pontos perdidos por erro',
+          wrongPenaltyPointsLabel: 'Pontos perdidos por não rir',
           wrongPenaltyPointsSub: 'Desconta pontos quando ninguém ri ou o tempo acaba',
           roundFlowLabel: 'Fluxo da rodada',
           roundFlowSub: 'Preparação curta, piada sempre visível e marcação rápida de riso',
@@ -449,7 +450,7 @@
           'high-contrast': 'Alto Contraste'
         },
         footer: {
-          copyPrefix: '© 2025 Não Pode Rir v6.1 · Insight X Lab Technologies'
+          copyPrefix: '© 2025 Não Pode Rir v0.1 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Time A',
@@ -539,7 +540,7 @@
         userIdErrors: {
           fileRequired: 'Selecione um arquivo de user_id.',
           invalidJson: 'Arquivo inválido. Envie um JSON de user_id.',
-          invalidSchema: 'Este arquivo não é um backup de user_id da MimiMania.',
+          invalidSchema: 'Este arquivo não é um backup de user_id do Não Pode Rir.',
           invalidUserId: 'O user_id do arquivo é inválido.'
         }
       },
@@ -635,8 +636,8 @@
           connected: 'Connected',
           disconnected: 'Disconnected',
           guestWaiting: 'Waiting for the host to start the game.',
-          guestPreparing: 'Waiting for the joke to be prepared.',
-          guestMemorizing: 'The round is about to start.',
+          guestPreparing: 'Waiting for the host to prepare the round.',
+          guestMemorizing: 'Get ready! The joke will appear in a moment.',
           guestPlaying: 'Keep a straight face!',
           guestJokeTurn: 'Your turn to read on the companion screen.',
           guestScore: 'Waiting for the next turn.',
@@ -709,8 +710,8 @@
           readySub: 'Only the reader should look! Everyone else close your eyes! 👀',
           readyDrawingSub: 'Only the companion reader should look! Everyone else close your eyes! 👀',
           revealWord: '🎲 Draw Joke',
-          memorizeTitle: '⚡ Prepare the reading!',
-          startsIn: 'The reading starts in...',
+          memorizeTitle: '⚡ Get ready!',
+          startsIn: 'The joke appears in...',
           onlyMimeCanSee: 'Only the reader can see it!',
           onlyDrawerCanSee: 'Only the companion reader can see it!',
           secondsLabel: 'SECONDS',
@@ -834,11 +835,13 @@
           timerTitle: '⏱️ Timer',
           roundTimeLabel: 'Round Time',
           roundTimeSub: 'Seconds to read the joke',
+          prepareTimeLabel: 'Preparation Time',
+          prepareTimeSub: 'Seconds before the joke appears',
           penaltyLabel: 'Skip Penalty',
           penaltySub: '−10 points when skipping',
-          correctPointsLabel: 'Points for a correct answer',
+          correctPointsLabel: 'Points per laugh',
           correctPointsSub: 'Points for the player who makes the other side laugh',
-          wrongPenaltyPointsLabel: 'Points lost for a mistake',
+          wrongPenaltyPointsLabel: 'Points lost for not laughing',
           wrongPenaltyPointsSub: 'Subtracts points when nobody laughs or time runs out',
           roundFlowLabel: 'Round flow',
           roundFlowSub: 'Short prep, joke always visible, and a quick laugh/no-laugh decision',
@@ -896,7 +899,7 @@
           'high-contrast': 'High Contrast'
         },
         footer: {
-          copyPrefix: '© 2025 No Laughing Allowed v · Insight X Lab Technologies'
+          copyPrefix: '© 2025 No Laughing Allowed v0.1 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Team A',
@@ -986,7 +989,7 @@
         userIdErrors: {
           fileRequired: 'Select a user_id file.',
           invalidJson: 'Invalid file. Upload a user_id JSON.',
-          invalidSchema: 'This file is not a MimiMania user_id backup.',
+          invalidSchema: 'This file is not a No Laughing Allowed user_id backup.',
           invalidUserId: 'The user_id in the file is invalid.'
         }
       },
@@ -1082,8 +1085,8 @@
           connected: 'Conectado',
           disconnected: 'Desconectado',
           guestWaiting: 'Esperando que el host inicie la partida.',
-          guestPreparing: 'Esperando que se revele la palabra.',
-          guestMemorizing: 'La ronda va a empezar.',
+          guestPreparing: 'Esperando a que el host prepare la ronda.',
+          guestMemorizing: '¡Prepárate! El chiste aparecerá enseguida.',
           guestPlaying: '¡Adivinen!',
           guestScore: 'Esperando el próximo turno.',
           guestFinal: 'Partida finalizada.',
@@ -1150,8 +1153,8 @@
           readySub: '¡Solo el mimo debe mirar! ¡Los demás cierren los ojos! 👀',
           readyDrawingSub: '¡Solo quien va a dibujar debe mirar! ¡Los demás cierren los ojos! 👀',
           revealWord: '🎲 Mostrar Palabra',
-          memorizeTitle: '⚡ ¡Memoriza la palabra!',
-          startsIn: 'El juego empieza en...',
+          memorizeTitle: '⚡ ¡Prepárate!',
+          startsIn: 'El chiste aparece en...',
           onlyMimeCanSee: '¡Solo el mimo puede verla!',
           onlyDrawerCanSee: '¡Solo quien dibuja puede verla!',
           secondsLabel: 'SEGUNDOS',
@@ -1256,12 +1259,14 @@
           timerTitle: '⏱️ Temporizador',
           roundTimeLabel: 'Tiempo por Ronda',
           roundTimeSub: 'Segundos para adivinar',
+          prepareTimeLabel: 'Tiempo de Preparación',
+          prepareTimeSub: 'Segundos antes de que aparezca el chiste',
           penaltyLabel: 'Penalización por Skip',
           penaltySub: '−10 puntos al saltar',
-          correctPointsLabel: 'Puntos por acierto',
-          correctPointsSub: 'Puntos para quien hace la mímica o dibuja',
-          wrongPenaltyPointsLabel: 'Puntos perdidos por error',
-          wrongPenaltyPointsSub: 'Descuenta puntos cuando el jugador falla o se acaba el tiempo',
+          correctPointsLabel: 'Puntos por risa',
+          correctPointsSub: 'Puntos para quien hace reír al otro lado',
+          wrongPenaltyPointsLabel: 'Puntos perdidos por no reír',
+          wrongPenaltyPointsSub: 'Descuenta puntos cuando nadie se ríe o se acaba el tiempo',
           ffaGuesserPointsLabel: 'Puntos para quien adivina (FFA)',
           ffaGuesserPointsSub: 'En Todos contra todos, elige quién acertó tras cada acierto',
           ffaGuesserPointsValueLabel: 'Puntos de quien acertó',
@@ -1320,7 +1325,7 @@
           'high-contrast': 'Alto Contraste'
         },
         footer: {
-          copyPrefix: '© 2025 Desafío de Mímica v6.1 · Insight X Lab Technologies'
+          copyPrefix: '© 2025 Desafío de Mímica v0.1 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Equipo A',
@@ -1409,7 +1414,7 @@
         userIdErrors: {
           fileRequired: 'Selecciona un archivo de user_id.',
           invalidJson: 'Archivo inválido. Sube un JSON de user_id.',
-          invalidSchema: 'Este archivo no es una copia de user_id de MimiMania.',
+          invalidSchema: 'Este archivo no es una copia de user_id de No Laughing Allowed.',
           invalidUserId: 'El user_id del archivo no es válido.'
         }
       }
@@ -1510,8 +1515,8 @@
         connected: 'Connecté',
         disconnected: 'Déconnecté',
         guestWaiting: 'En attente du lancement par l’hôte.',
-        guestPreparing: 'En attente de la révélation du mot.',
-        guestMemorizing: 'La manche va commencer.',
+        guestPreparing: 'En attente que l’hôte prépare la manche.',
+        guestMemorizing: 'Prépare-toi ! La blague arrive dans un instant.',
         guestPlaying: 'Devinez !',
         guestScore: 'En attente du prochain tour.',
         guestFinal: 'Partie terminée.',
@@ -1574,8 +1579,8 @@
         readySub: 'Seul le mime doit regarder ! Les autres ferment les yeux ! 👀',
         readyDrawingSub: 'Seul le dessinateur doit regarder ! Les autres ferment les yeux ! 👀',
         revealWord: '🎲 Révéler le mot',
-        memorizeTitle: '⚡ Mémorisez le mot !',
-        startsIn: 'Le jeu commence dans...',
+        memorizeTitle: '⚡ Prépare-toi !',
+        startsIn: 'La blague apparaît dans...',
         onlyMimeCanSee: 'Seul le mime peut voir !',
         onlyDrawerCanSee: 'Seul le dessinateur peut voir !',
         secondsLabel: 'SECONDES',
@@ -1672,12 +1677,14 @@
         timerTitle: '⏱️ Minuteur',
         roundTimeLabel: 'Temps par manche',
         roundTimeSub: 'Secondes pour deviner',
+        prepareTimeLabel: 'Temps de préparation',
+        prepareTimeSub: 'Secondes avant l’apparition de la blague',
         penaltyLabel: 'Pénalité de skip',
         penaltySub: '−10 points en passant',
-        correctPointsLabel: 'Points par bonne réponse',
-        correctPointsSub: 'Points pour celui qui mime ou dessine',
-        wrongPenaltyPointsLabel: 'Points perdus en cas d’erreur',
-        wrongPenaltyPointsSub: 'Retire des points si le joueur se trompe ou si le temps expire',
+        correctPointsLabel: 'Points par rire',
+        correctPointsSub: 'Points pour celui qui fait rire l’autre camp',
+        wrongPenaltyPointsLabel: 'Points perdus pour ne pas rire',
+        wrongPenaltyPointsSub: 'Retire des points si personne ne rit ou si le temps expire',
         ffaGuesserPointsLabel: 'Points pour celui qui devine (FFA)',
         ffaGuesserPointsSub: 'En chacun pour soi, choisissez qui a deviné après chaque bonne réponse',
         ffaGuesserPointsValueLabel: 'Points de celui qui a deviné',
@@ -1726,7 +1733,7 @@
         footerAriaLabel: 'Partager Défi du Mime'
       },
       theme: { cosmic: 'Cosmique', 'liquid-glass': 'Automne', material3: 'Printemps', 'light-mode': 'Mode clair', 'dark-mode': 'Mode sombre', 'high-contrast': 'Contraste élevé' },
-      footer: { copyPrefix: '© 2025 Défi du Mime v6.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Défi du Mime v0.1 · Insight X Lab Technologies' },
       teams: { defaultA: 'Équipe A', defaultB: 'Équipe B' },
       players: { defaultName: 'Joueur {number}' },
       dynamic: {
@@ -1809,7 +1816,7 @@
       userIdErrors: {
         fileRequired: 'Sélectionnez un fichier de user_id.',
         invalidJson: 'Fichier invalide. Envoyez un JSON de user_id.',
-        invalidSchema: 'Ce fichier n’est pas une sauvegarde de user_id MimiMania.',
+        invalidSchema: 'Ce fichier n’est pas une sauvegarde user_id de No Laughing Allowed.',
         invalidUserId: 'Le user_id du fichier est invalide.'
       }
     });
@@ -1893,8 +1900,8 @@
         connected: 'Verbunden',
         disconnected: 'Getrennt',
         guestWaiting: 'Warte, bis der Host das Spiel startet.',
-        guestPreparing: 'Warte, bis das Wort aufgedeckt wird.',
-        guestMemorizing: 'Die Runde beginnt gleich.',
+        guestPreparing: 'Warte, bis der Host die Runde vorbereitet hat.',
+        guestMemorizing: 'Mach dich bereit! Der Witz erscheint gleich.',
         guestPlaying: 'Rat mal!',
         guestScore: 'Warte auf den nächsten Zug.',
         guestFinal: 'Spiel beendet.',
@@ -1957,8 +1964,8 @@
         readySub: 'Nur der Mime darf schauen! Alle anderen Augen zu! 👀',
         readyDrawingSub: 'Nur der Zeichner darf schauen! Alle anderen Augen zu! 👀',
         revealWord: '🎲 Wort anzeigen',
-        memorizeTitle: '⚡ Merke dir das Wort!',
-        startsIn: 'Das Spiel beginnt in...',
+        memorizeTitle: '⚡ Mach dich bereit!',
+        startsIn: 'Der Witz erscheint in...',
         onlyMimeCanSee: 'Nur der Mime darf es sehen!',
         onlyDrawerCanSee: 'Nur der Zeichner darf es sehen!',
         secondsLabel: 'SEKUNDEN',
@@ -2055,12 +2062,14 @@
         timerTitle: '⏱️ Timer',
         roundTimeLabel: 'Zeit pro Runde',
         roundTimeSub: 'Sekunden zum Raten',
+        prepareTimeLabel: 'Vorbereitungszeit',
+        prepareTimeSub: 'Sekunden, bevor der Witz erscheint',
         penaltyLabel: 'Skip-Strafe',
         penaltySub: '−10 Punkte beim Überspringen',
-        correctPointsLabel: 'Punkte für richtig',
-        correctPointsSub: 'Punkte für den Spieler, der darstellt oder zeichnet',
-        wrongPenaltyPointsLabel: 'Punktverlust bei Fehler',
-        wrongPenaltyPointsSub: 'Zieht Punkte ab, wenn der Spieler falsch liegt oder die Zeit abläuft',
+        correctPointsLabel: 'Punkte pro Lacher',
+        correctPointsSub: 'Punkte für den Spieler, der die andere Seite zum Lachen bringt',
+        wrongPenaltyPointsLabel: 'Punktverlust fürs Nichtlachen',
+        wrongPenaltyPointsSub: 'Zieht Punkte ab, wenn niemand lacht oder die Zeit abläuft',
         ffaGuesserPointsLabel: 'Punkte für den Ratenden (FFA)',
         ffaGuesserPointsSub: 'In Jeder gegen jeden nach jedem Treffer auswählen, wer geraten hat',
         ffaGuesserPointsValueLabel: 'Punkte für den Ratenden',
@@ -2109,7 +2118,7 @@
         footerAriaLabel: 'Pantomime Challenge teilen'
       },
       theme: { cosmic: 'Kosmisch', 'liquid-glass': 'Herbst', material3: 'Frühling', 'light-mode': 'Heller Modus', 'dark-mode': 'Dunkler Modus', 'high-contrast': 'Hoher Kontrast' },
-      footer: { copyPrefix: '© 2025 Pantomime Challenge v6.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Pantomime Challenge v0.1 · Insight X Lab Technologies' },
       teams: { defaultA: 'Team A', defaultB: 'Team B' },
       players: { defaultName: 'Spieler {number}' },
       dynamic: {
@@ -2192,7 +2201,7 @@
       userIdErrors: {
         fileRequired: 'Wähle eine user_id-Datei aus.',
         invalidJson: 'Ungültige Datei. Lade ein user_id-JSON hoch.',
-        invalidSchema: 'Diese Datei ist kein MimiMania-user_id-Backup.',
+        invalidSchema: 'Diese Datei ist kein No-Laughing-Allowed-user_id-Backup.',
         invalidUserId: 'Die user_id in der Datei ist ungültig.'
       }
     });
@@ -2276,8 +2285,8 @@
         connected: 'Connesso',
         disconnected: 'Disconnesso',
         guestWaiting: 'In attesa che l’host inizi la partita.',
-        guestPreparing: 'In attesa che la parola venga rivelata.',
-        guestMemorizing: 'Il turno sta per iniziare.',
+        guestPreparing: 'In attesa che l’host prepari il turno.',
+        guestMemorizing: 'Preparati! La battuta apparirà tra poco.',
         guestPlaying: 'Indovinate!',
         guestScore: 'In attesa del prossimo turno.',
         guestFinal: 'Partita terminata.',
@@ -2340,8 +2349,8 @@
         readySub: 'Solo chi mima deve guardare! Gli altri chiudano gli occhi! 👀',
         readyDrawingSub: 'Solo chi disegna deve guardare! Gli altri chiudano gli occhi! 👀',
         revealWord: '🎲 Rivela parola',
-        memorizeTitle: '⚡ Memorizza la parola!',
-        startsIn: 'Il gioco inizia tra...',
+        memorizeTitle: '⚡ Preparati!',
+        startsIn: 'La battuta appare tra...',
         onlyMimeCanSee: 'Solo chi mima può vedere!',
         onlyDrawerCanSee: 'Solo chi disegna può vedere!',
         secondsLabel: 'SECONDI',
@@ -2438,12 +2447,14 @@
         timerTitle: '⏱️ Timer',
         roundTimeLabel: 'Tempo per turno',
         roundTimeSub: 'Secondi per indovinare',
+        prepareTimeLabel: 'Tempo di Preparazione',
+        prepareTimeSub: 'Secondi prima che appaia la battuta',
         penaltyLabel: 'Penalità per skip',
         penaltySub: '−10 punti quando si passa',
-        correctPointsLabel: 'Punti per risposta corretta',
-        correctPointsSub: 'Punti per chi fa la mimica o disegna',
-        wrongPenaltyPointsLabel: 'Punti persi per errore',
-        wrongPenaltyPointsSub: 'Sottrae punti quando il giocatore sbaglia o finisce il tempo',
+        correctPointsLabel: 'Punti per risata',
+        correctPointsSub: 'Punti per chi fa ridere l’altra parte',
+        wrongPenaltyPointsLabel: 'Punti persi per non ridere',
+        wrongPenaltyPointsSub: 'Sottrae punti quando nessuno ride o finisce il tempo',
         ffaGuesserPointsLabel: 'Punti per chi indovina (FFA)',
         ffaGuesserPointsSub: 'In Tutti contro tutti, scegli chi ha indovinato dopo ogni risposta corretta',
         ffaGuesserPointsValueLabel: 'Punti di chi ha indovinato',
@@ -2492,7 +2503,7 @@
         footerAriaLabel: 'Condividi Sfida di Mimica'
       },
       theme: { cosmic: 'Cosmico', 'liquid-glass': 'Autunno', material3: 'Primavera', 'light-mode': 'Modalità chiara', 'dark-mode': 'Modalità scura', 'high-contrast': 'Alto contrasto' },
-      footer: { copyPrefix: '© 2025 Sfida di Mimica v6.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Sfida di Mimica v0.1 · Insight X Lab Technologies' },
       teams: { defaultA: 'Squadra A', defaultB: 'Squadra B' },
       players: { defaultName: 'Giocatore {number}' },
       dynamic: {
@@ -2575,7 +2586,7 @@
       userIdErrors: {
         fileRequired: 'Seleziona un file user_id.',
         invalidJson: 'File non valido. Carica un JSON di user_id.',
-        invalidSchema: 'Questo file non è un backup user_id di MimiMania.',
+        invalidSchema: 'Questo file non è un backup user_id di No Laughing Allowed.',
         invalidUserId: 'Lo user_id nel file non è valido.'
       }
     });
@@ -2693,22 +2704,6 @@
       return normalizeJokeBank(normalized);
     }
 
-    function normalizeWordBank(bank) {
-      if (bank && typeof bank === 'object' && CATEGORY_KEYS.some(category => Array.isArray(bank?.[category]))) {
-        return createLegacyWordBankFromJokeBank(bank);
-      }
-      const normalized = createEmptyWordBank();
-      DIFFICULTY_KEYS.forEach(diff => {
-        CATEGORY_KEYS.forEach(cat => {
-          const words = bank?.[diff]?.[cat];
-          normalized[diff][cat] = Array.isArray(words)
-            ? words.map(word => String(word).trim()).filter(Boolean)
-            : [];
-        });
-      });
-      return normalized;
-    }
-
     function normalizeChallenges(list) {
       return Array.isArray(list)
         ? list.map(item => String(item).trim()).filter(Boolean)
@@ -2770,7 +2765,31 @@
         'Por que o tapete era zen? Porque já estava acostumado a ser pisado e seguir firme.',
         'Por que a colher foi contratada? Porque mexia com a equipe inteira.',
         'Por que o capacete era tão centrado? Porque protegia bem as próprias ideias.',
-        'Por que a lata contou piada? Porque queria descontrair o ambiente.'
+        'Por que a lata contou piada? Porque queria descontrair o ambiente.',
+        'Por que o desodorante virou palestrante? Porque sabia como manter o público sem suor frio.',
+        'Por que a torneira foi fazer terapia? Porque não aguentava mais engolir tudo a seco.',
+        'Por que o cofre ficou vaidoso? Porque finalmente encontrou seu valor interior.',
+        'Por que o quadro branco evitava brigas? Porque preferia apagar o assunto.',
+        'Por que a lixeira se sentia injustiçada? Porque jogavam nela até os problemas dos outros.',
+        'Por que o espremedor abriu consultoria? Porque sabia tirar o melhor de cada situação.',
+        'Por que a escova de cabelo virou mediadora? Porque desembaraçava qualquer conflito.',
+        'Por que o prendedor de roupa ganhou prêmio? Porque segurava a barra como ninguém.',
+        'Por que o cadeado ficou desconfiado? Porque vivia cercado de segredos.',
+        'Por que a campainha se achava popular? Porque todo mundo fazia questão de tocar nela.',
+        'Por que o coador era tão paciente? Porque deixava as coisas passarem no tempo certo.',
+        'Por que a garrafa térmica era respeitada? Porque mantinha a postura em qualquer clima.',
+        'Por que o rodo ficou orgulhoso? Porque limpava a situação sem passar pano.',
+        'Por que o clipe subiu na carreira? Porque sabia prender a atenção da chefia.',
+        'Por que a fita adesiva era carinhosa? Porque se apegava muito fácil.',
+        'Por que o despertador abriu academia? Porque adorava botar todo mundo para acordar para a vida.',
+        'Por que o molho de tomate entrou na política? Porque prometia mais consistência no prato.',
+        'Por que o filtro de café era discreto? Porque não gostava de aparecer mais do que o necessário.',
+        'Por que a trena foi promovida? Porque media bem as consequências.',
+        'Por que o ímã era carismático? Porque atraía boas conversas.',
+        'Por que o ralador virou crítico? Porque gostava de deixar tudo bem afiado.',
+        'Por que a caixinha de fósforo parecia confiante? Porque sabia acender qualquer ideia.',
+        'Por que o varal se deu bem nas relações? Porque sabia dar espaço sem perder a conexão.',
+        'Por que o zíper era confiável? Porque sabia exatamente a hora de fechar a questão.'
       ],
       tiozao: [
         'Qual é o café mais perigoso do mundo? O ex-presso.',
@@ -2823,7 +2842,31 @@
         'Qual é a ave que mais reclama? O urubu-mingão do trânsito.',
         'O que a cebola disse para o cozinheiro? Se me cortar, você chora.',
         'Por que o shampoo foi ao bar? Porque queria uma saideira com condicionador.',
-        'Qual é o doce mais educado? O bombom dia.'
+        'Qual é o doce mais educado? O bombom dia.',
+        'Qual é o cúmulo da paciência? Esperar a pipoca estourar uma por uma.',
+        'O que o padeiro falou quando ficou rico? Agora sim estou com a mão na massa.',
+        'Qual é o peixe que trabalha com tecnologia? O beta tester.',
+        'Por que o ovo foi ao stand-up? Porque queria quebrar o gelo.',
+        'O que a impressora falou no casamento? Eu os declaro bem impressos.',
+        'Qual é o animal que sempre repete tudo? O papagaio, porque já nasce no modo eco.',
+        'O que o relógio faz quando está com fome? Pede segundo prato.',
+        'Qual é a sobremesa preferida do pedreiro? O pavê.',
+        'Por que o fósforo não faz faculdade? Porque já sai queimado.',
+        'O que a torneira falou para o cano? Nossa amizade é de pressão.',
+        'Qual é a matéria favorita da régua? A que tem mais medida.',
+        'O que o milho falou na formatura? Agora eu estou pipocando de emoção.',
+        'Por que o ventilador não conta segredo? Porque espalha tudo.',
+        'Qual é o remédio favorito do tomate? O extrato.',
+        'O que o travesseiro falou no escritório? Preciso de um descanso remunerado.',
+        'Por que a moeda foi para a aula? Porque queria valer mais.',
+        'Qual é o cúmulo da limpeza? Lavar a louça para sujar só um copo depois.',
+        'O que a panela disse para a tampa? Você me completa por cima.',
+        'Por que a escada foi ao psicólogo? Porque estava se sentindo para baixo.',
+        'Qual é o carro favorito do eletricista? O choquewagen.',
+        'O que o shampoo disse para o condicionador? Nossa relação está de cabelo em pé.',
+        'Por que o livro de receitas tirou férias? Porque estava de saco cheio de virar página.',
+        'Qual é o cúmulo da sorte? Cair de costas e achar dinheiro no bolso.',
+        'O que o lápis falou para o apontador? Nossa relação sempre chega ao ponto.'
       ],
       cotidiano: [
         'Por que a geladeira sussurrou de madrugada? Porque eu entrei tão silencioso na cozinha que ela só faltou dizer pega logo e vai embora.',
@@ -2851,7 +2894,56 @@
         'Por que o chão perde a dignidade rápido? Porque basta eu passar pano para alguém entrar com areia emocional.',
         'Por que o elevador parece ensaio fotográfico? Porque todo mundo finge que ignora o espelho enquanto posa.',
         'Por que achar a tampa certa do pote parece jogo? Porque a cozinha tem um escape room próprio.',
-        'Por que abro o aplicativo do banco com cuidado? Porque ele sempre confirma que continuo humilde.'
+        'Por que abro o aplicativo do banco com cuidado? Porque ele sempre confirma que continuo humilde.',
+        'Por que o entregador sempre chega quando entro no banho? Porque o universo gosta de testar meu tempo de toalha.',
+        'Por que a senha do condomínio parece vingança? Porque cada visita precisa fazer um concurso público.',
+        'Por que o controle remoto desaparece justo no filme? Porque ele sente o suspense antes da gente.',
+        'Por que a roupa lavada demora a secar no dia certo? Porque o sol também trabalha sob demanda.',
+        'Por que o aplicativo de comida me julga? Porque sempre pergunta se quero pedir de novo a mesma escolha emocional.',
+        'Por que eu reviso a lista do mercado cinco vezes? Porque ainda assim volto sem o item principal.',
+        'Por que o elevador para em todos os andares quando estou atrasado? Porque ele acredita na inclusão.',
+        'Por que o café da manhã some rápido em casa? Porque alguém sempre belisca e chama de teste.',
+        'Por que a busca pelo carregador virou esporte? Porque cada cômodo tem um cabo que não serve para nada.',
+        'Por que a chuva começa no minuto da saída? Porque guarda-chuva só funciona como decoração.',
+        'Por que a fila do caixa anda quando eu troco de lado? Porque ela respeita a lei do constrangimento.',
+        'Por que abrir a geladeira tantas vezes não ajuda? Porque a resposta continua sendo não ter sobremesa.',
+        'Por que a sacola do mercado rasga perto da porta? Porque ela gosta de final dramático.',
+        'Por que o micro-ondas apita como se eu não estivesse perto? Porque ele ama expor minha ansiedade.',
+        'Por que toda tomada útil fica atrás do móvel pesado? Porque praticidade seria bom demais.',
+        'Por que o ônibus chega vazio só quando não preciso? Porque pontualidade gosta de plateia errada.',
+        'Por que a lâmpada queima à noite? Porque problema doméstico adora horário nobre.',
+        'Por que eu sempre esqueço a garrafa d’água? Porque a sede gosta de me encontrar longe da cozinha.',
+        'Por que a busca pela chave começa sempre tarde? Porque ela só revela a localização quando o atraso já venceu.',
+        'Por que a máquina de lavar termina quando ninguém lembra dela? Porque ela valoriza o efeito surpresa.',
+        'Por que o aplicativo do banco abre com suspense? Porque saldo baixo também merece trilha dramática.',
+        'Por que toda visita toca campainha quando a casa está um caos? Porque organização não rende história.',
+        'Por que a louça suja se multiplica rápido? Porque copo sozinho sempre chama companhia.',
+        'Por que o armário derruba tudo quando abro? Porque ele trabalha com armazenamento por emoção.',
+        'Por que o fogão escolhe a boca errada para esquentar mais? Porque receita boa precisa de tensão.',
+        'Por que o sofá me prende em cinco minutos? Porque ele entende de sequestro afetivo.',
+        'Por que o aplicativo de mapa recalcula tanto? Porque até ele desaprova o meu improviso.',
+        'Por que eu dobro roupa e ela nunca acaba? Porque o cesto tem pacto de renovação automática.',
+        'Por que o interfone toca quando finalmente sentei? Porque descanso em casa é apenas conceito.',
+        'Por que o mercado de bairro decora meu rosto? Porque eu volto três vezes pela mesma cebola esquecida.',
+        'Por que o despertador parece pessoal? Porque ele me acusa diariamente de escolhas do passado.',
+        'Por que a cadeira da sala vira cabide? Porque toda roupa tem um plano B antes do guarda-roupa.',
+        'Por que o aplicativo de clima erra no dia do evento? Porque previsão ama humilhar produção.',
+        'Por que a comida esquenta por fora e congela por dentro? Porque o micro-ondas apoia o mistério.',
+        'Por que a busca pela tampa certa do pote nunca acaba? Porque a cozinha acredita em alma gêmea difícil.',
+        'Por que a bateria do celular despenca na rua? Porque tomada próxima tira todo o drama da história.',
+        'Por que o vizinho decide furar parede cedo? Porque silêncio de manhã não rende amizade.',
+        'Por que toda atualização acontece quando preciso sair? Porque tecnologia também tem timing cômico.',
+        'Por que eu encontro o documento só depois de pedir segunda via? Porque papel gosta de atenção.',
+        'Por que o chinelo some só de um pé? Porque o outro resolveu viver relacionamento aberto.',
+        'Por que o refrigerante termina na festa antes do gelo? Porque alguém sempre serve copos com sede antiga.',
+        'Por que eu lavo a louça e surge outra pia? Porque panela usada se reproduz no vapor.',
+        'Por que a encomenda diz saiu para entrega o dia inteiro? Porque ela gosta de suspense em tempo real.',
+        'Por que o piso fica limpo por oito segundos? Porque toda casa tem gente especializada em entrar logo depois.',
+        'Por que o secador só enrola o fio? Porque praticidade nunca foi o departamento dele.',
+        'Por que o fone dá nó sozinho no bolso? Porque ele treina macramê escondido.',
+        'Por que abrir o guarda-chuva dentro de casa parece tentador? Porque lá fora ele falha com compromisso.',
+        'Por que a comida favorita acaba primeiro? Porque a travessa reconhece fraqueza emocional.',
+        'Por que a nota fiscal some no exato dia da troca? Porque objeto importante adora brincar de invisível.'
       ],
       familia: [
         'Como eu sei que minha mãe ficou brava? Porque ela falou meu nome completo com CEP e coordenadas.',
@@ -2879,7 +2971,56 @@
         'O que significa chegar cedo para o meu primo? Um conceito completamente flexível.',
         'Por que casal em mercado é prova de compatibilidade? Porque o preço do sabonete revela caráter.',
         'Por que minha mãe fala que não quer bagunça? Porque é exatamente quando resolve arrumar tudo ao mesmo tempo.',
-        'Por que recusar comida da avó parece crime? Porque ela oferece com insistência de decreto federal.'
+        'Por que recusar comida da avó parece crime? Porque ela oferece com insistência de decreto federal.',
+        'Por que toda mãe pergunta se levei casaco em pleno calor? Porque prevenção para ela nunca tira férias.',
+        'Por que o pai desliga a luz em toda casa? Porque ele acha que foi eleito ministro da energia.',
+        'Por que o grupo da família parece telejornal? Porque cada bom dia já vem com boletim completo.',
+        'Por que visita de parente sempre rende fome? Porque ninguém chega dizendo que acabou de almoçar.',
+        'Por que meu irmão vira auditor da geladeira? Porque ele percebe até o sumiço de uma azeitona.',
+        'Por que a sobremesa não sobrevive ao almoço em família? Porque sempre existe um alguém só provando pela terceira vez.',
+        'Por que o tio conta a mesma piada convicto? Porque ele mede sucesso pelo volume do próprio riso.',
+        'Por que a avó oferece comida de cinco em cinco minutos? Porque recusa para ela é só a primeira rodada.',
+        'Por que o casal discute no GPS? Porque ninguém aceita que a voz da rota tem mais razão.',
+        'Por que o controle da TV vira tema diplomático? Porque cada pessoa da casa acha que herdou o trono.',
+        'Por que a criança escolhe justo aquele brinquedo barulhento? Porque paz doméstica não dá ibope.',
+        'Por que toda mudança de sofá mexe com a família? Porque tem gente apegada até ao lugar do controle.',
+        'Por que a mãe sabe que mexeram na panela? Porque existe perícia emocional de cozinha.',
+        'Por que o pai demora para sair de casa? Porque sempre falta uma última conferida em portas que já estavam fechadas.',
+        'Por que o almoço de domingo termina em marmita? Porque afeto de família também usa pote com tampa.',
+        'Por que meu primo some na hora de arrumar e volta para comer? Porque ele respeita a divisão clássica de talentos.',
+        'Por que a sogra elogia e aconselha ao mesmo tempo? Porque ela trabalha com feedback híbrido.',
+        'Por que toda foto de família precisa de cinco tentativas? Porque sempre tem alguém piscando e outro filosofando sobre enquadramento.',
+        'Por que a criança pergunta tudo na hora da pressa? Porque curiosidade infantil reconhece urgência.',
+        'Por que a sala lota quando o bolo chega? Porque laço familiar também atende pelo cheiro de cobertura.',
+        'Por que o casal se entende no mercado e se estranha no corredor de limpeza? Porque cada produto desperta uma verdade.',
+        'Por que a tia traz lembrancinha para todo mundo? Porque voltar de viagem de mãos vazias é crime no estatuto dela.',
+        'Por que o avô aumenta a própria história a cada ano? Porque memória boa também gosta de efeitos especiais.',
+        'Por que todo irmão sabe exatamente quando implicar? Porque ele nasceu com sensor para timing inconveniente.',
+        'Por que a mãe diz que não quer presente? Porque o teste verdadeiro é adivinhar qual ela queria.',
+        'Por que a família toda opina na reforma? Porque parede dos outros sempre aceita mais ideias.',
+        'Por que o churrasco vira reunião estratégica? Porque todo mundo tem plano, mas só um segura o fogo.',
+        'Por que a criança corre quando ouve tomar banho? Porque negociação de higiene sempre abre audiência pública.',
+        'Por que meu pai confia mais em memória do que em lista? Porque admitir que esquece algo fere a honra dele.',
+        'Por que a avó manda embora com comida extra? Porque afeto para ela é peso na sacola.',
+        'Por que o casal se perde em viagem curta? Porque ninguém quer dar o braço a torcer para o aplicativo.',
+        'Por que a casa fica silenciosa quando a criança apronta? Porque silêncio repentino é boletim de ocorrência.',
+        'Por que minha irmã pede emprestado e chama de compartilhado? Porque posse na família é conceito flexível.',
+        'Por que o almoço especial atrasa? Porque receita em família sempre inclui conversa no meio.',
+        'Por que toda visita encontra algo para comentar na decoração? Porque observação gratuita é linguagem de parentesco.',
+        'Por que o sobrinho escolhe o colo mais arrumado? Porque mancha boa gosta de roupa clara.',
+        'Por que a mãe descobre mentira antes do fim da frase? Porque ela escuta até o que a culpa cochicha.',
+        'Por que o pai aumenta o volume da TV quando gosta do programa? Porque emoção dele mede em decibéis.',
+        'Por que o primo fala cinco minutos e já cria apelido? Porque intimidade na família entra sem bater.',
+        'Por que a viagem em família começa antes de sair? Porque a discussão sobre horário já conta como trajeto.',
+        'Por que todo mundo promete ajudar na louça? Porque prometer ainda não sujou a mão de ninguém.',
+        'Por que a avó manda mensagem perguntando se cheguei bem antes de eu chegar? Porque preocupação dela tem vantagem no relógio.',
+        'Por que o grupo da família revive assunto encerrado? Porque sempre aparece alguém lendo atrasado.',
+        'Por que o irmão mais novo se faz de inocente tão bem? Porque prática diária também forma talento.',
+        'Por que o pai estaciona e dá aula de direção depois? Porque manobra boa precisa de comentário.',
+        'Por que a mãe fala leva um casaco e leva um docinho na mesma frase? Porque proteção e comida andam juntas.',
+        'Por que o casal divide série e mesmo assim discute? Porque fidelidade com spoiler é assunto sério.',
+        'Por que reunião de família precisa de café no fim? Porque ainda falta energia para a rodada de despedidas.',
+        'Por que a despedida da visita demora meia hora? Porque brasileiro inventou o tchau em capítulos.'
       ],
       escola_trabalho: [
         'Por que o aluno ficou em branco na prova? Porque estudou tanto que esqueceu até o próprio nome na hora H.',
@@ -2907,7 +3048,56 @@
         'O que acontece quando o professor fala atividade em dupla? A sala inteira vira aplicativo de procura.',
         'Por que meu crachá já não impressiona? Porque minha cara de desespero abre mais portas.',
         'Qual é a lei de toda call? Sempre tem alguém falando no mudo e alguém com cachorro coapresentador.',
-        'Por que a planilha parecia literatura experimental? Porque já precisava de licença poética para ser entendida.'
+        'Por que a planilha parecia literatura experimental? Porque já precisava de licença poética para ser entendida.',
+        'Por que o professor fala é rapidinho antes da atividade? Porque ele acredita em conceitos muito otimistas de tempo.',
+        'Por que a planilha trava quando estou inspirado? Porque produtividade gosta de ser testada.',
+        'Por que o aluno lembra da matéria saindo da prova? Porque o cérebro gosta de reprise fora de horário.',
+        'Por que toda tarefa em grupo começa em silêncio? Porque cada um espera o outro demonstrar liderança primeiro.',
+        'Por que o chefe manda oi antes do pedido? Porque ansiedade no trabalho também merece aquecimento.',
+        'Por que a impressora aceita papel até o dia do prazo? Porque depois disso ela entra em manifesto.',
+        'Por que a cadeira do escritório reclama mais que eu? Porque ela participa de todas as reuniões sem direito a pausa.',
+        'Por que o projetor falha na apresentação importante? Porque tecnologia adora palco cheio.',
+        'Por que a sala de aula fica interessada perto do sinal? Porque atenção também toca campainha.',
+        'Por que o estagiário aprende rápido a fazer cara de tranquilo? Porque pânico visível não entra no dress code.',
+        'Por que o e-mail de alinhamento sempre cresce? Porque alinhamento corporativo se alimenta de respostas em cadeia.',
+        'Por que o professor fala isso cai na prova com tanta calma? Porque só a turma precisa entrar em desespero.',
+        'Por que todo trabalho urgente nasce no fim da tarde? Porque a pressa gosta de pegar carona no expediente.',
+        'Por que o grupo do trabalho usa tantos thumbs up? Porque ninguém quer escrever eu não faço ideia.',
+        'Por que a prova oral parece maratona? Porque a boca seca antes da largada.',
+        'Por que a caneta some em reunião? Porque material de escritório tem alma nômade.',
+        'Por que a call começa com você me ouve? Porque metade do time confia mais no ritual do que no microfone.',
+        'Por que o caderno fica bonito no primeiro dia? Porque depois a realidade assume a diagramação.',
+        'Por que a senha do sistema expira quando finalmente decoro? Porque estabilidade nunca foi meta.',
+        'Por que todo professor ama trabalho para amanhã? Porque surpresa pedagógica rende adrenalina.',
+        'Por que o notebook pede atualização na aula? Porque ele escolheu crescer justamente no meu colapso.',
+        'Por que o aluno do fundo sempre sabe da resposta quando a aula termina? Porque coragem dele tem atraso.',
+        'Por que a pausa para café vira reunião paralela? Porque a verdade da empresa mora perto da garrafa térmica.',
+        'Por que o slide mais importante nunca abre? Porque arquivo decisivo também gosta de suspense.',
+        'Por que o crachá sempre vira ao contrário na portaria? Porque constrangimento adora acesso controlado.',
+        'Por que o professor pergunta alguma dúvida no fim? Porque ele conhece o poder do silêncio coletivo.',
+        'Por que o prazo de sexta parece menor? Porque fim de semana já puxa o calendário para longe.',
+        'Por que todo mundo diz vamos marcar outra reunião? Porque resolver na atual seria radical demais.',
+        'Por que o relatório cresce sozinho? Porque todo pedido de ajuste adota mais um parágrafo.',
+        'Por que a régua quebra no dia do cartaz? Porque material escolar sente cheiro de avaliação.',
+        'Por que o aluno abre a mochila dez vezes? Porque o item esquecido se esconde melhor sob pressão.',
+        'Por que o chefe fala sem pressa e manda para hoje? Porque contradição também ocupa cargo alto.',
+        'Por que o quadro branco apaga mal justo na explicação difícil? Porque a pedagogia também gosta de efeitos.',
+        'Por que a turma fica unida antes da entrega? Porque nada fortalece mais que um prazo quase fatal.',
+        'Por que o teclado do escritório faz barulho heroico? Porque cada e-mail sai como se fosse épico.',
+        'Por que a apresentação compartilhada vira caos? Porque versão final é sempre uma ideia provisória.',
+        'Por que o professor encontra exatamente quem não estudou? Porque sorte acadêmica tem péssima pontaria.',
+        'Por que a fila da copiadora anda devagar? Porque cada pessoa descobre uma configuração inédita.',
+        'Por que o aluno quer sentar na frente na prova? Porque cola mental funciona melhor perto da esperança.',
+        'Por que a reunião que podia ser mensagem dura uma hora? Porque formalidade gosta de cadeira.',
+        'Por que o supervisor aparece quando abro o lanche? Porque produtividade reconhece cheiro de pausa.',
+        'Por que o trabalho fica fácil cinco minutos depois de eu entregar? Porque a resposta gosta de humilhar.',
+        'Por que o livro mais pesado cai no dia de levar tudo? Porque coluna também precisa de desafio.',
+        'Por que o comentário do professor assusta mais que a nota? Porque vem cheio de potencial interpretativo.',
+        'Por que o celular vibra quando a aula entra no ponto bom? Porque distração respeita timing dramático.',
+        'Por que a lista de presença sempre chega no meu momento de distração? Porque assinatura também é teste de reflexo.',
+        'Por que a impressora do RH imprime torto? Porque até a burocracia gosta de personalidade.',
+        'Por que o aluno fala presente com atraso? Porque a alma dele ainda estava no corredor.',
+        'Por que a sexta no trabalho parece prova final? Porque todo mundo quer terminar tudo antes que o relógio descubra.'
       ],
       absurdo: [
         'Por que o pombo abriu uma startup? Porque queria vender migalhas premium para investidores de praça.',
@@ -2935,7 +3125,56 @@
         'Por que a nuvem comprou patins? Porque queria fazer chuva com mais estilo.',
         'Quando o caracol prometeu entregar a mensagem? Até terça de algum ano.',
         'Por que a meia perdida fundou uma república? Porque cansou de viver exilada na máquina de lavar.',
-        'Por que o tomate entrou para o teatro experimental? Porque só queria atuar em saladas existenciais.'
+        'Por que o tomate entrou para o teatro experimental? Porque só queria atuar em saladas existenciais.',
+        'Por que o abajur quis aprender mergulho? Porque sonhava iluminar o fundo do oceano.',
+        'Por que a sardinha virou coach? Porque prometia ensinar cardumes a pensarem fora da lata.',
+        'Por que o guarda-roupa pediu passaporte? Porque queria conhecer cabides internacionais.',
+        'Por que o biscoito abriu observatório? Porque desconfiava que a lua era recheada.',
+        'Por que o chinelo contratou segurança? Porque andava cercado de passos suspeitos.',
+        'Por que a colher foi eleita rainha? Porque mexia com todo o reino.',
+        'Por que o tijolo escreveu poesia? Porque vivia cercado de paredes emocionais.',
+        'Por que o helicóptero foi à padaria? Porque ouviu falar em sonho fresco.',
+        'Por que o abacate comprou gravata? Porque queria parecer maduro em reuniões.',
+        'Por que o teclado fundou uma banda submarina? Porque queria tocar em recifes maiores.',
+        'Por que a formiga abriu um hotel de luxo? Porque cansou de morar em terra alugada.',
+        'Por que o chapéu desistiu da política? Porque já tinha muita cabeça para cobrir.',
+        'Por que o espantalho estudou astronomia? Porque passava noites olhando estrelas e corvos.',
+        'Por que a geleia virou juíza? Porque sabia lidar com casos pegajosos.',
+        'Por que o sapato foi ao espaço? Porque ouviu dizer que lá em cima o salto era maior.',
+        'Por que o chuveiro pediu autógrafo ao trovão? Porque era fã de shows molhados.',
+        'Por que a melancia abriu academia de dança? Porque queria ensinar rebolado com equilíbrio.',
+        'Por que o despertador se mudou para a floresta? Porque queria acordar passarinho no grito.',
+        'Por que a bicicleta escreveu um romance? Porque tinha duas rodas de sentimentos.',
+        'Por que o fósforo abriu agência de viagens? Porque vivia vendendo pacotes relâmpago.',
+        'Por que o escorredor de macarrão virou filósofo? Porque só deixava passar o essencial.',
+        'Por que o foguetinho de festa pediu terapia? Porque explodia por qualquer motivo.',
+        'Por que o peixe-palhaço abriu banco? Porque gostava de investimentos de mergulho.',
+        'Por que o ventilador foi morar no deserto? Porque queria finalmente ter plateia fixa.',
+        'Por que a gaveta adotou uma nuvem? Porque estava cansada de guardar só coisas secas.',
+        'Por que o óculos quis virar ponte? Porque já passava o dia ligando dois mundos.',
+        'Por que o pudim virou mágico? Porque sumia assim que entrava em cena.',
+        'Por que o carimbo pediu férias na praia? Porque só conhecia papel e pressão.',
+        'Por que a estrela cadente abriu serviço de entregas? Porque fazia tudo em alta velocidade.',
+        'Por que o pregador de roupa quis ser DJ? Porque nasceu para prender hits no varal.',
+        'Por que o tapete abriu escola de voo? Porque vivia sonhando em ser tapete mágico.',
+        'Por que a cebola montou uma banda triste? Porque todo ensaio terminava em lágrimas.',
+        'Por que o marcador de texto foi ao circo? Porque queria destacar números brilhantes.',
+        'Por que o canudo virou historiador? Porque gostava de sugar detalhes do passado.',
+        'Por que o sorvete usou cachecol? Porque tinha medo de pegar muito calor.',
+        'Por que a mala pediu aula de teatro? Porque queria aprender a fazer entrada triunfal.',
+        'Por que o dominó abriu templo? Porque acreditava no efeito cascata espiritual.',
+        'Por que o garfo virou astrônomo? Porque passava noites procurando estrelas no prato.',
+        'Por que a janela adotou um polvo? Porque queria finalmente ter cortinas com atitude.',
+        'Por que o sabonete montou uma startup espacial? Porque queria limpar a reputação de Marte.',
+        'Por que o barco foi ao salão de beleza? Porque queria cortar as ondas com estilo.',
+        'Por que o abajur levou protetor solar? Porque ia enfrentar uma ideia muito brilhante.',
+        'Por que a abóbora virou detetive paranormal? Porque já nasceu pronta para assombrar pistas.',
+        'Por que o elevador escreveu ficção científica? Porque entendia de subidas dimensionais.',
+        'Por que o varal quis ser diplomata? Porque passava o dia mediando roupas tensas.',
+        'Por que o guarda-chuva estudou canto lírico? Porque queria se abrir em grandes apresentações.',
+        'Por que o cacto abriu cafeteria? Porque acreditava em atendimento espinhosamente sincero.',
+        'Por que a torrada fundou um partido? Porque queria mais espaço para a manteiga de todos.',
+        'Por que o aspirador sonhava em ser poeta? Porque já vivia recolhendo restos de inspiração.'
       ]
     };
 
@@ -3140,942 +3379,6 @@
     const READING_CHALLENGES_FR = clone(READING_CHALLENGES_PT);
     const READING_CHALLENGES_DE = clone(READING_CHALLENGES_PT);
     const READING_CHALLENGES_IT = clone(READING_CHALLENGES_PT);
-
-    const DEFAULT_WORDS_PT = {
-      easy: {
-        objects: [
-          'Bola', 'Copo', 'Chapéu', 'Sapato', 'Livro', 'Cadeira', 'Mesa', 'Cama', 'Porta', 'Janela',
-          'Lápis', 'Borracha', 'Mochila', 'Óculos', 'Guarda-chuva', 'Telefone', 'Espelho', 'Escova', 'Pente', 'Tesoura',
-          'Chave', 'Garfo', 'Colher', 'Prato', 'Garrafa', 'Almofada', 'Cobertor', 'Toalha', 'Sabão', 'Balão',
-          'Boneca', 'Carrinho', 'Pipoca', 'Sorvete', 'Bolo', 'Maçã', 'Banana', 'Uva', 'Flor', 'Árvore',
-          'Sol', 'Lua', 'Estrela', 'Nuvem', 'Chuva', 'Guarda-roupa', 'Armário', 'Geladeira', 'Fogão', 'Televisão'
-        ],
-        actions: [
-          'Correr', 'Pular', 'Dormir', 'Comer', 'Beber', 'Rir', 'Chorar', 'Dançar', 'Cantar', 'Nadar',
-          'Voar', 'Andar', 'Sentar', 'Levantar', 'Abraçar', 'Brincar', 'Desenhar', 'Pintar', 'Ler', 'Escrever',
-          'Ouvir', 'Gritar', 'Soprar', 'Respirar', 'Tossir', 'Espirrar', 'Bocejar', 'Aplaudir', 'Acenar', 'Apontar',
-          'Pegar', 'Jogar', 'Chutar', 'Empurrar', 'Puxar', 'Abrir', 'Fechar', 'Lavar mãos', 'Escovar dentes', 'Pentear',
-          'Calçar sapato', 'Tirar sapato', 'Ligar TV', 'Apagar luz', 'Bater palma', 'Girar', 'Rolar', 'Beijar', 'Sorrir', 'Pensar'
-        ],
-        animals: [
-          'Cachorro', 'Gato', 'Peixe', 'Passarinho', 'Coelho', 'Galinha', 'Vaca', 'Cavalo', 'Porco', 'Ovelha',
-          'Pato', 'Sapo', 'Borboleta', 'Formiga', 'Abelha', 'Aranha', 'Minhoca', 'Lesma', 'Caracol', 'Lagarta',
-          'Elefante', 'Leão', 'Girafa', 'Macaco', 'Zebra', 'Hipopótamo', 'Crocodilo', 'Tartaruga', 'Pinguim', 'Urso',
-          'Lobo', 'Raposa', 'Veado', 'Esquilo', 'Rato', 'Hamster', 'Iguana', 'Papagaio', 'Tucano', 'Flamingo',
-          'Pelicano', 'Canguru', 'Koala', 'Panda', 'Golfinho', 'Baleia', 'Polvo', 'Caranguejo', 'Camarão', 'Estrela-do-mar'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'O Rei Leão', 'Toy Story', 'Frozen', 'Shrek', 'Harry Potter', 'Homem-Aranha', 'Batman', 'Superman',
-          'Jurassic Park', 'Vingadores', 'Star Wars', 'Minions', 'Carros', 'Procurando Nemo', 'Divertida Mente', 'Aladdin',
-          'Cinderela', 'Branca de Neve', 'Matrix', 'Gladiador', 'E.T.', 'King Kong', 'Godzilla', 'Pantera Negra', 'Homem de Ferro',
-          'Capitão América', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Piratas do Caribe', 'Jumanji',
-          'Missão Impossível', '007', 'Rocky', 'Rambo', 'Karate Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Monstros S.A.', 'Up', 'Encanto', 'Moana', 'Zootopia'
-        ],
-        professions: [
-          'Médico', 'Dentista', 'Professor', 'Policial', 'Bombeiro', 'Motorista', 'Cozinheiro', 'Garçom', 'Padeiro', 'Carteiro',
-          'Mecânico', 'Engenheiro', 'Advogado', 'Enfermeiro', 'Veterinário', 'Piloto', 'Cabeleireiro', 'Barbeiro', 'Ator', 'Cantor',
-          'Dançarino', 'Faxineiro', 'Segurança', 'Agricultor', 'Pescador', 'Eletricista', 'Pedreiro', 'Pintor', 'Jardineiro',
-          'Taxista', 'Entregador', 'Vendedor', 'Caixa', 'Secretária', 'Recepcionista', 'Treinador', 'Personal Trainer', 'Babá',
-          'Cuidador', 'Zelador', 'Lixeiro', 'Frentista', 'Motorista de ônibus', 'Motorista de caminhão', 'Guia turístico', 'Fotógrafo',
-          'Repórter', 'Radialista', 'Operador de caixa', 'Instrutor'
-        ],
-        celebrities: [
-          'Neymar', 'Messi', 'Cristiano Ronaldo', 'Pelé', 'Anitta', 'Taylor Swift', 'Beyoncé', 'Lady Gaga', 'Justin Bieber', 'Rihanna',
-          'Shakira', 'Madonna', 'Elvis Presley', 'Michael Jackson', 'The Rock', 'Vin Diesel', 'Will Smith', 'Tom Cruise',
-          'Leonardo DiCaprio', 'Brad Pitt', 'Angelina Jolie', 'Scarlett Johansson', 'Jennifer Lopez', 'Selena Gomez', 'Zendaya',
-          'Miley Cyrus', 'Ariana Grande', 'Ed Sheeran', 'Drake', 'Kanye West', 'Billie Eilish', 'Harry Styles', 'Daniel Radcliffe',
-          'Emma Watson', 'Robert Downey Jr', 'Chris Hemsworth', 'Chris Evans', 'Gal Gadot', 'Margot Robbie', 'Ryan Reynolds',
-          'Keanu Reeves', 'Jackie Chan', 'Bruce Lee', 'Sylvester Stallone', 'Arnold Schwarzenegger', 'Oprah Winfrey', 'Kim Kardashian',
-          'MrBeast', 'Mark Zuckerberg', 'Elon Musk'
-        ]
-      },
-      normal: {
-        objects: [
-          'Computador', 'Teclado', 'Rádio', 'Máquina de lavar', 'Aspirador', 'Liquidificador', 'Batedeira', 'Cafeteira', 'Sofá', 'Estante',
-          'Ventilador', 'Ar-condicionado', 'Micro-ondas', 'Forno', 'Pia', 'Banheira', 'Chuveiro', 'Mala', 'Lanterna', 'Binóculo',
-          'Câmera', 'Relógio', 'Calculadora', 'Termômetro', 'Balança', 'Bússola', 'Violão', 'Piano', 'Tambor', 'Flauta',
-          'Sanfona', 'Trompete', 'Violino', 'Gaita', 'Xilofone', 'Raquete', 'Skate', 'Patins', 'Luva de boxe', 'Capacete',
-          'Colete', 'Cinto', 'Gravata', 'Bolsa', 'Guarda-chuva', 'Bengala', 'Muleta', 'Cadeira de rodas', 'Óculos de sol', 'Boné'
-        ],
-        actions: [
-          'Cozinhar', 'Dirigir', 'Pedalar', 'Pescar', 'Mergulhar', 'Escalar', 'Acampar', 'Fazer ioga', 'Meditar', 'Fotografar',
-          'Filmar', 'Pintar quadro', 'Esculpir', 'Tricotar', 'Costurar', 'Bordar', 'Jardinagem', 'Regar planta', 'Podar árvore', 'Varrer',
-          'Limpar janela', 'Passar roupa', 'Dobrar roupa', 'Fazer cama', 'Lavar louça', 'Secar louça', 'Descascar fruta', 'Ralar queijo',
-          'Amassar pão', 'Remar', 'Surfar', 'Esquiar', 'Patinar', 'Driblar', 'Arremessar', 'Defender gol', 'Servir tênis',
-          'Fazer ginástica', 'Aplaudir', 'Discursar', 'Entrevistar', 'Escalar parede', 'Fazer mágica', 'Equilibrar', 'Malabarismo',
-          'Digitar', 'Telefonar', 'Tirar selfie', 'Pagar conta', 'Fazer fila'
-        ],
-        animals: [
-          'Águia', 'Falcão', 'Coruja', 'Morcego', 'Camelo', 'Lhama', 'Alpaca', 'Bisão', 'Alce', 'Coyote',
-          'Guepardo', 'Leopardo', 'Jaguar', 'Puma', 'Rinoceronte', 'Anaconda', 'Ornitorrinco', 'Dingo', 'Cacatua', 'Emu',
-          'Orca', 'Tubarão', 'Arraia', 'Lula', 'Cavalo-marinho', 'Ouriço-do-mar', 'Arara', 'Pavão', 'Avestruz', 'Casuar',
-          'Albatroz', 'Cegonha', 'Pelicano', 'Íbis', 'Garça', 'Lontra', 'Foca', 'Morsa', 'Leão-marinho', 'Dugongo',
-          'Cabra-da-montanha', 'Íbex', 'Antílope', 'Gnu', 'Búfalo', 'Javali', 'Texugo', 'Guaxinim', 'Furão', 'Musaranho'
-        ],
-        movies: [
-          'Interestelar', 'A Origem', 'Duna', 'Clube da Luta', 'Pulp Fiction', 'O Lobo de Wall Street', 'Coringa', 'Parasita',
-          'O Grande Gatsby', 'Django Livre', 'Bastardos Inglórios', 'Whiplash', 'La La Land', 'Cisne Negro', 'O Iluminado',
-          'Doutor Estranho', 'Guardiões da Galáxia', 'Capitã Marvel', 'Logan', 'John Wick', 'Matrix Reloaded', 'Matrix Revolutions',
-          'O Regresso', 'Gravidade', 'Mad Max Estrada da Fúria', 'Blade Runner 2049', 'O Exterminador do Futuro', 'De Volta para o Futuro',
-          'O Sexto Sentido', 'O Show de Truman', 'A Múmia', 'O Código Da Vinci', 'Anjos e Demônios', 'Os Jogos Vorazes', 'Crepúsculo',
-          'It A Coisa', 'Invocação do Mal', 'Annabelle', 'A Freira', 'Jogos Mortais', 'Corra', 'Nós', 'Fragmentado', 'Glass',
-          'Velozes e Furiosos', 'Top Gun', 'Missão Impossível Fallout', 'Kingsman', 'Sherlock Holmes', 'O Homem de Aço'
-        ],
-        professions: [
-          'Programador', 'Designer', 'Arquiteto', 'Nutricionista', 'Psicólogo', 'Psiquiatra', 'Fisioterapeuta', 'Farmacêutico',
-          'Biólogo', 'Químico', 'Físico', 'Geólogo', 'Astrônomo', 'Tradutor', 'Intérprete', 'Editor de vídeo', 'Diretor de cinema',
-          'Produtor musical', 'DJ', 'Youtuber', 'Influenciador', 'Streamer', 'Publicitário', 'Redator', 'Analista de sistemas',
-          'Administrador', 'Contador', 'Economista', 'Corretor de imóveis', 'Corretor de seguros', 'Investigador', 'Detetive',
-          'Perito criminal', 'Auditor', 'Consultor', 'Coach', 'Treinador esportivo', 'Atleta profissional', 'Surfista',
-          'Jogador de futebol', 'Lutador', 'Coreógrafo', 'Maquiador', 'Esteticista', 'Tatuador', 'Ilustrador', 'Animador',
-          'Game designer', 'Roteirista', 'Dublador'
-        ],
-        celebrities: [
-          'Timothée Chalamet', 'Florence Pugh', 'Pedro Pascal', 'Jenna Ortega', 'Tom Holland', 'Andrew Garfield', 'Tobey Maguire',
-          'Benedict Cumberbatch', 'Martin Scorsese', 'Quentin Tarantino', 'Christopher Nolan', 'Denis Villeneuve', 'Greta Gerwig',
-          'Jordan Peele', 'Dwayne Johnson', 'Jason Statham', 'Idris Elba', 'Henry Cavill', 'Millie Bobby Brown', 'Noah Schnapp',
-          'Finn Wolfhard', 'Sadie Sink', 'Travis Scott', 'Post Malone', 'The Weeknd', 'Dua Lipa', 'Olivia Rodrigo', 'Doja Cat',
-          'Bad Bunny', 'Karol G', 'Peso Pluma', 'Lizzo', 'Snoop Dogg', 'Eminem', '50 Cent', 'Jay-Z', 'Kendrick Lamar',
-          'J Balvin', 'Maluma', 'Gisele Bündchen', 'Adriana Lima', 'Lewis Hamilton', 'Usain Bolt', 'Michael Jordan',
-          'Serena Williams', 'Roger Federer', 'Novak Djokovic', 'Simone Biles', 'Tony Hawk'
-        ]
-      },
-      hard: {
-        objects: [
-          'Estetoscópio', 'Bisturi', 'Microscópio', 'Telescópio', 'Sextante', 'Astrolábio', 'Cronômetro', 'Metrônomo', 'Afinador', 'Desfibrilador',
-          'Catapulta', 'Periscópio', 'Destilador', 'Centrífuga', 'Incubadora', 'Autoclave', 'Espectrômetro', 'Cromatógrafo', 'Calorômetro', 'Potenciômetro',
-          'Fisga', 'Arpão', 'Bumerangue', 'Arco e flecha', 'Besta', 'Lança', 'Maça', 'Machado', 'Foice', 'Tridente',
-          'Sanduicheira', 'Desidratador', 'Fermentador', 'Slow cooker', 'Wok', 'Tagine', 'Fondue', 'Churrasqueira', 'Defumador', 'Alambique',
-          'Teodolito', 'Altímetro', 'Barômetro', 'Higrômetro', 'Anemômetro', 'Pluviômetro', 'Sismógrafo', 'Gerador', 'Transformador', 'Osciloscópio'
-        ],
-        actions: [
-          'Equilibrar na corda bamba', 'Engolir fogo', 'Escapar de camisa de força', 'Quebrar tijolos com a mão',
-          'Andar sobre brasas', 'Ler braille', 'Fazer sinalização de mergulho', 'Comunicar em libras', 'Código morse', 'Tocar instrumento com os pés',
-          'Extrair dente', 'Fazer cirurgia', 'Ressuscitar', 'Imobilizar fratura', 'Aplicar torniquete',
-          'Fazer esgrima', 'Praticar tai chi', 'Golpe de caratê', 'Arremesso de martelo', 'Lançamento de dardo olímpico',
-          'Arar terra', 'Ordenhar vaca', 'Tosquiar ovelha', 'Ferrar cavalo', 'Domar boi',
-          'Tecer no tear', 'Soprar vidro', 'Forjar metal', 'Moldar cerâmica no torno', 'Restaurar quadro',
-          'Decolar avião', 'Pousar helicóptero', 'Navegar barco a vela', 'Operar guindaste', 'Conduzir trem',
-          'Fazer rapel', 'Alpinismo em rocha', 'Tirolesa', 'Escalada livre', 'Slackline',
-          'Desativar bomba', 'Negociar reféns', 'Paraquedismo', 'Corrida de obstáculos', 'Levantamento de peso olímpico'
-        ],
-        animals: [
-          'Axolote', 'Tarsídeo', 'Fossa', 'Quokka', 'Numbat', 'Kakapo', 'Tuátara', 'Okapi', 'Takin', 'Saiga',
-          'Dugongo', 'Manatim', 'Narval', 'Beluga', 'Cachalote', 'Rorcual', 'Jubarte', 'Boto', 'Toninha', 'Franciscana',
-          'Escorpião', 'Tarântula', 'Mamba-negra', 'Taipan', 'Cobra-de-coral', 'Viperão', 'Cascavel', 'Boomslang', 'Lula-gigante', 'Polvo-de-anéis-azuis',
-          'Baiacu', 'Peixe-pedra', 'Peixe-leão', 'Cone-do-mar', 'Medusa-da-caixa', 'Vespa-asiática', 'Besouro-bombardeiro', 'Mosquito-tigre', 'Formiga-bala', 'Lagarta-de-fogo',
-          'Pangolim', 'Aye-aye', 'Loris-lento', 'Tatu-bola', 'Tatu-gigante', 'Tamanduá-bandeira', 'Preguiça-de-três-dedos', 'Ouriço-pigmeu', 'Musaranho-elefante', 'Marta-pinheira'
-        ],
-        movies: [
-          'O Farol', 'Hereditário', 'Midsommar', 'A Bruxa', 'O Sacrifício do Cervo Sagrado', 'O Lagosta', 'Dogville', 'Anticristo',
-          'Melancolia', 'A Árvore da Vida', 'Sinédoque Nova York', 'Donnie Darko', 'O Homem Duplicado', 'Enemy', 'Ex Machina', 'Aniquilação',
-          'Coerência', 'Primer', 'A Chegada', 'Moon', 'Solaris', 'Stalker', 'O Espelho', 'Persona', 'O Sétimo Selo', 'Amnésia',
-          'Cidade dos Sonhos', 'Veludo Azul', 'Eraserhead', 'A Fonte da Vida', 'O Poço', 'A Plataforma', 'Climax', 'Irreversível',
-          'Enter the Void', 'O Hospedeiro', 'Oldboy', 'Memórias de um Assassino', 'A Criada', 'Drive', 'Only God Forgives', 'O Mestre',
-          'Magnólia', 'There Will Be Blood', 'A Caça', 'O Som ao Redor', 'Bacurau', 'O Lobo Atrás da Porta', 'Que Horas Ela Volta'
-        ],
-        professions: [
-          'Neurocirurgião', 'Oncologista', 'Anestesista', 'Cardiologista', 'Ortopedista', 'Endocrinologista', 'Ginecologista', 'Urologista',
-          'Radiologista', 'Patologista', 'Epidemiologista', 'Bioinformata', 'Engenheiro de dados', 'Cientista de dados', 'Engenheiro aeroespacial',
-          'Engenheiro nuclear', 'Engenheiro de petróleo', 'Especialista em cibersegurança', 'Arquiteto de software', 'DevOps', 'Product Manager',
-          'Scrum Master', 'UX Researcher', 'UX Designer', 'UI Designer', 'Especialista em SEO', 'Trader', 'Analista financeiro',
-          'Gestor de investimentos', 'Atuário', 'Diplomata', 'Cônsul', 'Embaixador', 'Curador de museu', 'Restaurador de arte', 'Arqueólogo',
-          'Paleontólogo', 'Oceanógrafo', 'Meteorologista', 'Piloto de caça', 'Controlador de voo', 'Capitão de navio', 'Sommelier',
-          'Mestre cervejeiro', 'Chef executivo', 'Perfumista', 'Designer automotivo', 'Engenheiro robótico', 'Especialista em IA'
-        ],
-        celebrities: [
-          'Saoirse Ronan', 'Paul Mescal', 'Barry Keoghan', 'Cillian Murphy', 'Rami Malek', 'Mahershala Ali', 'Dev Patel', 'Riz Ahmed',
-          'Lakeith Stanfield', 'Oscar Isaac', 'Pedro Almodóvar', 'Wong Kar-wai', 'Bong Joon-ho', 'Park Chan-wook', 'Gaspar Noé', 'Lars von Trier',
-          'Yorgos Lanthimos', 'Ari Aster', 'Robert Eggers', 'Noah Baumbach', 'Charlie Kaufman', 'Tilda Swinton', 'Anya Taylor-Joy', 'Tim Burton',
-          'Guillermo del Toro', 'Alejandro Iñárritu', 'Alfonso Cuarón', 'Spike Lee', 'Wes Anderson', 'Taika Waititi', 'Hideo Kojima',
-          'Shigeru Miyamoto', 'Gabe Newell', 'Satya Nadella', 'Sundar Pichai', 'Tim Cook', 'Sam Altman', 'Demis Hassabis', 'Naval Ravikant',
-          'Gary Vaynerchuk', 'Ray Dalio', 'Warren Buffett', 'Charlie Munger', 'Howard Schultz', 'Reed Hastings', 'Susan Wojcicki',
-          'Kevin Feige', 'Kathleen Kennedy', 'Fei-Fei Li', 'Andrew Ng'
-        ]
-      }
-    };
-
-    const CHALLENGES_PT = [
-      'Faça a mímica sentado', 'Faça a mímica agachado', 'Faça a mímica pulando', 'Faça a mímica andando no lugar',
-      'Faça a mímica com uma mão nas costas', 'Faça a mímica usando só uma mão', 'Faça a mímica com braços esticados',
-      'Faça a mímica girando lentamente', 'Faça a mímica como se estivesse em câmera lenta', 'Faça a mímica como se estivesse acelerado (super rápido)',
-      'Faça a mímica exagerando MUITO', 'Faça a mímica quase sem se mexer', 'Faça a mímica como se estivesse com medo',
-      'Faça a mímica como se estivesse muito feliz', 'Faça a mímica como se estivesse bravo', 'Faça a mímica como se estivesse cansado',
-      'Faça a mímica como se estivesse confuso', 'Faça a mímica como se estivesse em pânico', 'Faça a mímica como um robô',
-      'Faça a mímica como um personagem de desenho animado', 'Faça a mímica como um idoso', 'Faça a mímica como uma criança',
-      'Faça a mímica como um super-herói', 'Faça a mímica como um vilão', 'Faça a mímica como um animal',
-      'Faça a mímica como se estivesse na lua (gravidade baixa)', 'Faça a mímica como se estivesse na água', 'Faça a mímica como se estivesse invisível',
-      'Faça a mímica como se estivesse gigante', 'Faça a mímica como se estivesse muito pequeno', 'Não pode usar as mãos',
-      'Não pode usar os braços', 'Não pode sair do lugar', 'Não pode repetir o mesmo gesto', 'Não pode apontar para nada',
-      'Não pode usar o rosto (sem expressão facial)', 'Só pode usar o rosto (sem corpo)', 'Tem que começar pelo final da ação',
-      'Tem que fazer tudo ao contrário (de trás pra frente)', 'Tem que parar completamente a cada 3 segundos',
-      'Faça a mímica como se estivesse em um filme de ação', 'Faça a mímica como se fosse uma comédia',
-      'Faça a mímica como se estivesse em câmera lenta dramática', 'Faça a mímica como se estivesse em um sonho',
-      'Faça a mímica como se estivesse com muito frio', 'Faça a mímica como se estivesse com muito calor',
-      'Faça a mímica como se estivesse no escuro', 'Faça a mímica como se estivesse em um palco',
-      'Faça a mímica como se estivesse sendo observado por uma plateia gigante', 'Faça a mímica como se fosse a última chance de ganhar o jogo'
-    ];
-
-    const DEFAULT_WORDS_EN = {
-      easy: {
-        objects: [
-          'Ball', 'Cup', 'Hat', 'Shoe', 'Book', 'Chair', 'Table', 'Bed', 'Door', 'Window',
-          'Pencil', 'Eraser', 'Backpack', 'Glasses', 'Umbrella', 'Phone', 'Mirror', 'Brush', 'Comb', 'Scissors',
-          'Key', 'Fork', 'Spoon', 'Plate', 'Bottle', 'Pillow', 'Blanket', 'Towel', 'Soap', 'Balloon',
-          'Doll', 'Toy car', 'Popcorn', 'Ice cream', 'Cake', 'Apple', 'Banana', 'Grapes', 'Flower', 'Tree',
-          'Sun', 'Moon', 'Star', 'Cloud', 'Rain', 'Wardrobe', 'Cabinet', 'Refrigerator', 'Stove', 'Television'
-        ],
-        actions: [
-          'Run', 'Jump', 'Sleep', 'Eat', 'Drink', 'Laugh', 'Cry', 'Dance', 'Sing', 'Swim',
-          'Fly', 'Walk', 'Sit', 'Stand up', 'Hug', 'Play', 'Draw', 'Paint', 'Read', 'Write',
-          'Listen', 'Shout', 'Blow', 'Breathe', 'Cough', 'Sneeze', 'Yawn', 'Clap', 'Wave', 'Point',
-          'Grab', 'Throw', 'Kick', 'Push', 'Pull', 'Open', 'Close', 'Wash hands', 'Brush teeth', 'Comb hair',
-          'Put on shoes', 'Take off shoes', 'Turn on TV', 'Turn off the light', 'Clap hands', 'Spin', 'Roll', 'Kiss', 'Smile', 'Think'
-        ],
-        animals: [
-          'Dog', 'Cat', 'Fish', 'Bird', 'Rabbit', 'Chicken', 'Cow', 'Horse', 'Pig', 'Sheep',
-          'Duck', 'Frog', 'Butterfly', 'Ant', 'Bee', 'Spider', 'Earthworm', 'Slug', 'Snail', 'Caterpillar',
-          'Elephant', 'Lion', 'Giraffe', 'Monkey', 'Zebra', 'Hippopotamus', 'Crocodile', 'Turtle', 'Penguin', 'Bear',
-          'Wolf', 'Fox', 'Deer', 'Squirrel', 'Mouse', 'Hamster', 'Iguana', 'Parrot', 'Toucan', 'Flamingo',
-          'Pelican', 'Kangaroo', 'Koala', 'Panda', 'Dolphin', 'Whale', 'Octopus', 'Crab', 'Shrimp', 'Starfish'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'The Lion King', 'Toy Story', 'Frozen', 'Shrek', 'Harry Potter', 'Spider-Man', 'Batman', 'Superman',
-          'Jurassic Park', 'The Avengers', 'Star Wars', 'Minions', 'Cars', 'Finding Nemo', 'Inside Out', 'Aladdin',
-          'Cinderella', 'Snow White', 'The Matrix', 'Gladiator', 'E.T.', 'King Kong', 'Godzilla', 'Black Panther', 'Iron Man',
-          'Captain America', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Pirates of the Caribbean', 'Jumanji',
-          'Mission: Impossible', '007', 'Rocky', 'Rambo', 'The Karate Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Monsters, Inc.', 'Up', 'Encanto', 'Moana', 'Zootopia'
-        ],
-        professions: [
-          'Doctor', 'Dentist', 'Teacher', 'Police officer', 'Firefighter', 'Driver', 'Cook', 'Waiter', 'Baker', 'Mail carrier',
-          'Mechanic', 'Engineer', 'Lawyer', 'Nurse', 'Veterinarian', 'Pilot', 'Hairdresser', 'Barber', 'Actor', 'Singer',
-          'Dancer', 'Cleaner', 'Security guard', 'Farmer', 'Fisherman', 'Electrician', 'Bricklayer', 'Painter', 'Gardener',
-          'Taxi driver', 'Delivery driver', 'Salesperson', 'Cashier', 'Secretary', 'Receptionist', 'Coach', 'Personal trainer', 'Babysitter',
-          'Caregiver', 'Janitor', 'Garbage collector', 'Gas station attendant', 'Bus driver', 'Truck driver', 'Tour guide', 'Photographer',
-          'Reporter', 'Radio host', 'Checkout operator', 'Instructor'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.easy.celebrities]
-      },
-      normal: {
-        objects: [
-          'Computer', 'Keyboard', 'Radio', 'Washing machine', 'Vacuum cleaner', 'Blender', 'Mixer', 'Coffee maker', 'Sofa', 'Shelf',
-          'Fan', 'Air conditioner', 'Microwave', 'Oven', 'Sink', 'Bathtub', 'Shower', 'Suitcase', 'Flashlight', 'Binoculars',
-          'Camera', 'Clock', 'Calculator', 'Thermometer', 'Scale', 'Compass', 'Acoustic guitar', 'Piano', 'Drum', 'Flute',
-          'Accordion', 'Trumpet', 'Violin', 'Harmonica', 'Xylophone', 'Racket', 'Skateboard', 'Roller skates', 'Boxing glove', 'Helmet',
-          'Vest', 'Belt', 'Tie', 'Bag', 'Umbrella', 'Cane', 'Crutch', 'Wheelchair', 'Sunglasses', 'Cap'
-        ],
-        actions: [
-          'Cook', 'Drive', 'Ride a bike', 'Fish', 'Dive', 'Climb', 'Camp', 'Do yoga', 'Meditate', 'Take photos',
-          'Film', 'Paint a picture', 'Sculpt', 'Knit', 'Sew', 'Embroider', 'Garden', 'Water plants', 'Prune a tree', 'Sweep',
-          'Clean a window', 'Iron clothes', 'Fold clothes', 'Make the bed', 'Wash dishes', 'Dry dishes', 'Peel fruit', 'Grate cheese',
-          'Knead bread', 'Row', 'Surf', 'Ski', 'Skate', 'Dribble', 'Throw', 'Block a goal', 'Serve in tennis',
-          'Exercise', 'Applaud', 'Give a speech', 'Interview', 'Climb a wall', 'Do magic', 'Balance', 'Juggle',
-          'Type', 'Make a phone call', 'Take a selfie', 'Pay a bill', 'Wait in line'
-        ],
-        animals: [
-          'Eagle', 'Falcon', 'Owl', 'Bat', 'Camel', 'Llama', 'Alpaca', 'Bison', 'Moose', 'Coyote',
-          'Cheetah', 'Leopard', 'Jaguar', 'Puma', 'Rhinoceros', 'Anaconda', 'Platypus', 'Dingo', 'Cockatoo', 'Emu',
-          'Orca', 'Shark', 'Stingray', 'Squid', 'Seahorse', 'Sea urchin', 'Macaw', 'Peacock', 'Ostrich', 'Cassowary',
-          'Albatross', 'Stork', 'Pelican', 'Ibis', 'Heron', 'Otter', 'Seal', 'Walrus', 'Sea lion', 'Dugong',
-          'Mountain goat', 'Ibex', 'Antelope', 'Wildebeest', 'Buffalo', 'Boar', 'Badger', 'Raccoon', 'Ferret', 'Shrew'
-        ],
-        movies: [
-          'Interstellar', 'Inception', 'Dune', 'Fight Club', 'Pulp Fiction', 'The Wolf of Wall Street', 'Joker', 'Parasite',
-          'The Great Gatsby', 'Django Unchained', 'Inglourious Basterds', 'Whiplash', 'La La Land', 'Black Swan', 'The Shining',
-          'Doctor Strange', 'Guardians of the Galaxy', 'Captain Marvel', 'Logan', 'John Wick', 'The Matrix Reloaded', 'The Matrix Revolutions',
-          'The Revenant', 'Gravity', 'Mad Max: Fury Road', 'Blade Runner 2049', 'The Terminator', 'Back to the Future',
-          'The Sixth Sense', 'The Truman Show', 'The Mummy', 'The Da Vinci Code', 'Angels & Demons', 'The Hunger Games', 'Twilight',
-          'It', 'The Conjuring', 'Annabelle', 'The Nun', 'Saw', 'Get Out', 'Us', 'Split', 'Glass',
-          'Fast & Furious', 'Top Gun', 'Mission: Impossible - Fallout', 'Kingsman', 'Sherlock Holmes', 'Man of Steel'
-        ],
-        professions: [
-          'Programmer', 'Designer', 'Architect', 'Nutritionist', 'Psychologist', 'Psychiatrist', 'Physical therapist', 'Pharmacist',
-          'Biologist', 'Chemist', 'Physicist', 'Geologist', 'Astronomer', 'Translator', 'Interpreter', 'Video editor', 'Film director',
-          'Music producer', 'DJ', 'YouTuber', 'Influencer', 'Streamer', 'Advertiser', 'Copywriter', 'Systems analyst',
-          'Administrator', 'Accountant', 'Economist', 'Real estate agent', 'Insurance broker', 'Investigator', 'Detective',
-          'Forensic expert', 'Auditor', 'Consultant', 'Coach', 'Sports coach', 'Professional athlete', 'Surfer',
-          'Football player', 'Fighter', 'Choreographer', 'Makeup artist', 'Esthetician', 'Tattoo artist', 'Illustrator', 'Animator',
-          'Game designer', 'Screenwriter', 'Voice actor'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.normal.celebrities]
-      },
-      hard: {
-        objects: [
-          'Stethoscope', 'Scalpel', 'Microscope', 'Telescope', 'Sextant', 'Astrolabe', 'Stopwatch', 'Metronome', 'Tuner', 'Defibrillator',
-          'Catapult', 'Periscope', 'Distiller', 'Centrifuge', 'Incubator', 'Autoclave', 'Spectrometer', 'Chromatograph', 'Calorimeter', 'Potentiometer',
-          'Slingshot', 'Harpoon', 'Boomerang', 'Bow and arrow', 'Crossbow', 'Spear', 'Mace', 'Axe', 'Sickle', 'Trident',
-          'Sandwich maker', 'Food dehydrator', 'Fermenter', 'Slow cooker', 'Wok', 'Tagine', 'Fondue set', 'Barbecue grill', 'Smoker', 'Still',
-          'Theodolite', 'Altimeter', 'Barometer', 'Hygrometer', 'Anemometer', 'Rain gauge', 'Seismograph', 'Generator', 'Transformer', 'Oscilloscope'
-        ],
-        actions: [
-          'Balance on a tightrope', 'Swallow fire', 'Escape from a straitjacket', 'Break bricks with your hand',
-          'Walk on hot coals', 'Read braille', 'Use diving hand signals', 'Communicate in sign language', 'Use Morse code', 'Play an instrument with your feet',
-          'Pull a tooth', 'Perform surgery', 'Resuscitate', 'Immobilize a fracture', 'Apply a tourniquet',
-          'Fence', 'Practice tai chi', 'Do a karate strike', 'Throw a hammer', 'Olympic javelin throw',
-          'Plow the land', 'Milk a cow', 'Shear a sheep', 'Shoe a horse', 'Tame an ox',
-          'Weave on a loom', 'Blow glass', 'Forge metal', 'Shape pottery on a wheel', 'Restore a painting',
-          'Take off in an airplane', 'Land a helicopter', 'Sail a sailboat', 'Operate a crane', 'Drive a train',
-          'Rappel', 'Rock climb', 'Zipline', 'Free climb', 'Slackline',
-          'Defuse a bomb', 'Negotiate with hostages', 'Skydive', 'Obstacle race', 'Olympic weightlifting'
-        ],
-        animals: [
-          'Axolotl', 'Tarsier', 'Fossa', 'Quokka', 'Numbat', 'Kakapo', 'Tuatara', 'Okapi', 'Takin', 'Saiga',
-          'Dugong', 'Manatee', 'Narwhal', 'Beluga', 'Sperm whale', 'Fin whale', 'Humpback whale', 'River dolphin', 'Porpoise', 'Franciscana',
-          'Scorpion', 'Tarantula', 'Black mamba', 'Taipan', 'Coral snake', 'Viper', 'Rattlesnake', 'Boomslang', 'Giant squid', 'Blue-ringed octopus',
-          'Pufferfish', 'Stonefish', 'Lionfish', 'Cone snail', 'Box jellyfish', 'Asian giant hornet', 'Bombardier beetle', 'Tiger mosquito', 'Bullet ant', 'Fire caterpillar',
-          'Pangolin', 'Aye-aye', 'Slow loris', 'Three-banded armadillo', 'Giant armadillo', 'Giant anteater', 'Three-toed sloth', 'Pygmy hedgehog', 'Elephant shrew', 'Pine marten'
-        ],
-        movies: [
-          'The Lighthouse', 'Hereditary', 'Midsommar', 'The Witch', 'The Killing of a Sacred Deer', 'The Lobster', 'Dogville', 'Antichrist',
-          'Melancholia', 'The Tree of Life', 'Synecdoche, New York', 'Donnie Darko', 'The Double', 'Enemy', 'Ex Machina', 'Annihilation',
-          'Coherence', 'Primer', 'Arrival', 'Moon', 'Solaris', 'Stalker', 'Mirror', 'Persona', 'The Seventh Seal', 'Memento',
-          'Mulholland Drive', 'Blue Velvet', 'Eraserhead', 'The Fountain', 'The Well', 'The Platform', 'Climax', 'Irreversible',
-          'Enter the Void', 'The Host', 'Oldboy', 'Memories of Murder', 'The Handmaiden', 'Drive', 'Only God Forgives', 'The Master',
-          'Magnolia', 'There Will Be Blood', 'The Hunt', 'Neighbouring Sounds', 'Bacurau', 'The Wolf Behind the Door', 'The Second Mother'
-        ],
-        professions: [
-          'Neurosurgeon', 'Oncologist', 'Anesthesiologist', 'Cardiologist', 'Orthopedist', 'Endocrinologist', 'Gynecologist', 'Urologist',
-          'Radiologist', 'Pathologist', 'Epidemiologist', 'Bioinformatician', 'Data engineer', 'Data scientist', 'Aerospace engineer',
-          'Nuclear engineer', 'Petroleum engineer', 'Cybersecurity specialist', 'Software architect', 'DevOps engineer', 'Product manager',
-          'Scrum master', 'UX researcher', 'UX designer', 'UI designer', 'SEO specialist', 'Trader', 'Financial analyst',
-          'Investment manager', 'Actuary', 'Diplomat', 'Consul', 'Ambassador', 'Museum curator', 'Art conservator', 'Archaeologist',
-          'Paleontologist', 'Oceanographer', 'Meteorologist', 'Fighter pilot', 'Air traffic controller', 'Ship captain', 'Sommelier',
-          'Master brewer', 'Executive chef', 'Perfumer', 'Automotive designer', 'Robotics engineer', 'AI specialist'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.hard.celebrities]
-      }
-    };
-
-    const DEFAULT_WORDS_ES = {
-      easy: {
-        objects: [
-          'Pelota', 'Vaso', 'Sombrero', 'Zapato', 'Libro', 'Silla', 'Mesa', 'Cama', 'Puerta', 'Ventana',
-          'Lápiz', 'Borrador', 'Mochila', 'Gafas', 'Paraguas', 'Teléfono', 'Espejo', 'Cepillo', 'Peine', 'Tijeras',
-          'Llave', 'Tenedor', 'Cuchara', 'Plato', 'Botella', 'Almohada', 'Manta', 'Toalla', 'Jabón', 'Globo',
-          'Muñeca', 'Carrito', 'Palomitas', 'Helado', 'Pastel', 'Manzana', 'Banana', 'Uvas', 'Flor', 'Árbol',
-          'Sol', 'Luna', 'Estrella', 'Nube', 'Lluvia', 'Armario', 'Gabinete', 'Refrigerador', 'Estufa', 'Televisión'
-        ],
-        actions: [
-          'Correr', 'Saltar', 'Dormir', 'Comer', 'Beber', 'Reír', 'Llorar', 'Bailar', 'Cantar', 'Nadar',
-          'Volar', 'Caminar', 'Sentarse', 'Levantarse', 'Abrazar', 'Jugar', 'Dibujar', 'Pintar', 'Leer', 'Escribir',
-          'Escuchar', 'Gritar', 'Soplar', 'Respirar', 'Toser', 'Estornudar', 'Bostezar', 'Aplaudir', 'Saludar', 'Señalar',
-          'Agarrar', 'Lanzar', 'Patear', 'Empujar', 'Jalar', 'Abrir', 'Cerrar', 'Lavar las manos', 'Cepillarse los dientes', 'Peinarse',
-          'Ponerse los zapatos', 'Quitarse los zapatos', 'Encender la TV', 'Apagar la luz', 'Dar palmadas', 'Girar', 'Rodar', 'Besar', 'Sonreír', 'Pensar'
-        ],
-        animals: [
-          'Perro', 'Gato', 'Pez', 'Pájaro', 'Conejo', 'Gallina', 'Vaca', 'Caballo', 'Cerdo', 'Oveja',
-          'Pato', 'Rana', 'Mariposa', 'Hormiga', 'Abeja', 'Araña', 'Lombriz', 'Babosa', 'Caracol', 'Oruga',
-          'Elefante', 'León', 'Jirafa', 'Mono', 'Cebra', 'Hipopótamo', 'Cocodrilo', 'Tortuga', 'Pingüino', 'Oso',
-          'Lobo', 'Zorro', 'Ciervo', 'Ardilla', 'Ratón', 'Hámster', 'Iguana', 'Loro', 'Tucán', 'Flamenco',
-          'Pelícano', 'Canguro', 'Koala', 'Panda', 'Delfín', 'Ballena', 'Pulpo', 'Cangrejo', 'Camarón', 'Estrella de mar'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'El Rey León', 'Toy Story', 'Frozen', 'Shrek', 'Harry Potter', 'Spider-Man', 'Batman', 'Superman',
-          'Jurassic Park', 'Los Vengadores', 'Star Wars', 'Minions', 'Cars', 'Buscando a Nemo', 'Intensamente', 'Aladdín',
-          'Cenicienta', 'Blancanieves', 'Matrix', 'Gladiador', 'E.T.', 'King Kong', 'Godzilla', 'Pantera Negra', 'Iron Man',
-          'Capitán América', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Piratas del Caribe', 'Jumanji',
-          'Misión: Imposible', '007', 'Rocky', 'Rambo', 'Karate Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Monsters, Inc.', 'Up', 'Encanto', 'Moana', 'Zootopia'
-        ],
-        professions: [
-          'Médico', 'Dentista', 'Profesor', 'Policía', 'Bombero', 'Conductor', 'Cocinero', 'Mesero', 'Panadero', 'Cartero',
-          'Mecánico', 'Ingeniero', 'Abogado', 'Enfermero', 'Veterinario', 'Piloto', 'Peluquero', 'Barbero', 'Actor', 'Cantante',
-          'Bailarín', 'Personal de limpieza', 'Guardia de seguridad', 'Agricultor', 'Pescador', 'Electricista', 'Albañil', 'Pintor', 'Jardinero',
-          'Taxista', 'Repartidor', 'Vendedor', 'Cajero', 'Secretaria', 'Recepcionista', 'Entrenador', 'Entrenador personal', 'Niñera',
-          'Cuidador', 'Conserje', 'Basurero', 'Gasolinero', 'Conductor de autobús', 'Conductor de camión', 'Guía turístico', 'Fotógrafo',
-          'Reportero', 'Locutor', 'Operador de caja', 'Instructor'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.easy.celebrities]
-      },
-      normal: {
-        objects: [
-          'Computadora', 'Teclado', 'Radio', 'Lavadora', 'Aspiradora', 'Licuadora', 'Batidora', 'Cafetera', 'Sofá', 'Estantería',
-          'Ventilador', 'Aire acondicionado', 'Microondas', 'Horno', 'Fregadero', 'Bañera', 'Ducha', 'Maleta', 'Linterna', 'Binoculares',
-          'Cámara', 'Reloj', 'Calculadora', 'Termómetro', 'Báscula', 'Brújula', 'Guitarra', 'Piano', 'Tambor', 'Flauta',
-          'Acordeón', 'Trompeta', 'Violín', 'Armónica', 'Xilófono', 'Raqueta', 'Patineta', 'Patines', 'Guante de boxeo', 'Casco',
-          'Chaleco', 'Cinturón', 'Corbata', 'Bolsa', 'Paraguas', 'Bastón', 'Muleta', 'Silla de ruedas', 'Gafas de sol', 'Gorra'
-        ],
-        actions: [
-          'Cocinar', 'Conducir', 'Andar en bicicleta', 'Pescar', 'Bucear', 'Escalar', 'Acampar', 'Hacer yoga', 'Meditar', 'Fotografiar',
-          'Filmar', 'Pintar un cuadro', 'Esculpir', 'Tejer', 'Coser', 'Bordar', 'Hacer jardinería', 'Regar plantas', 'Podar un árbol', 'Barrer',
-          'Limpiar una ventana', 'Planchar ropa', 'Doblar ropa', 'Hacer la cama', 'Lavar los platos', 'Secar los platos', 'Pelar fruta', 'Rallar queso',
-          'Amasar pan', 'Remar', 'Surfear', 'Esquiar', 'Patinar', 'Driblar', 'Lanzar', 'Atajar un gol', 'Sacar en tenis',
-          'Hacer ejercicio', 'Aplaudir', 'Dar un discurso', 'Entrevistar', 'Escalar un muro', 'Hacer magia', 'Equilibrarse', 'Hacer malabares',
-          'Teclear', 'Llamar por teléfono', 'Tomarse una selfie', 'Pagar una cuenta', 'Hacer fila'
-        ],
-        animals: [
-          'Águila', 'Halcón', 'Búho', 'Murciélago', 'Camello', 'Llama', 'Alpaca', 'Bisonte', 'Alce', 'Coyote',
-          'Guepardo', 'Leopardo', 'Jaguar', 'Puma', 'Rinoceronte', 'Anaconda', 'Ornitorrinco', 'Dingo', 'Cacatúa', 'Emú',
-          'Orca', 'Tiburón', 'Raya', 'Calamar', 'Caballito de mar', 'Erizo de mar', 'Guacamayo', 'Pavo real', 'Avestruz', 'Casuario',
-          'Albatros', 'Cigüeña', 'Pelícano', 'Ibis', 'Garza', 'Nutria', 'Foca', 'Morsa', 'León marino', 'Dugongo',
-          'Cabra montés', 'Íbice', 'Antílope', 'Ñu', 'Búfalo', 'Jabalí', 'Tejón', 'Mapache', 'Hurón', 'Musaraña'
-        ],
-        movies: [
-          'Interestelar', 'Origen', 'Duna', 'El club de la pelea', 'Pulp Fiction', 'El lobo de Wall Street', 'Joker', 'Parásitos',
-          'El gran Gatsby', 'Django sin cadenas', 'Bastardos sin gloria', 'Whiplash', 'La La Land', 'El cisne negro', 'El resplandor',
-          'Doctor Strange', 'Guardianes de la Galaxia', 'Capitana Marvel', 'Logan', 'John Wick', 'Matrix recargado', 'Matrix revoluciones',
-          'El renacido', 'Gravedad', 'Mad Max: Furia en el camino', 'Blade Runner 2049', 'Terminator', 'Volver al futuro',
-          'El sexto sentido', 'El show de Truman', 'La momia', 'El código Da Vinci', 'Ángeles y demonios', 'Los juegos del hambre', 'Crepúsculo',
-          'It', 'El conjuro', 'Annabelle', 'La monja', 'Saw', '¡Huye!', 'Nosotros', 'Fragmentado', 'Glass',
-          'Rápidos y furiosos', 'Top Gun', 'Misión: Imposible - Repercusión', 'Kingsman', 'Sherlock Holmes', 'El hombre de acero'
-        ],
-        professions: [
-          'Programador', 'Diseñador', 'Arquitecto', 'Nutricionista', 'Psicólogo', 'Psiquiatra', 'Fisioterapeuta', 'Farmacéutico',
-          'Biólogo', 'Químico', 'Físico', 'Geólogo', 'Astrónomo', 'Traductor', 'Intérprete', 'Editor de video', 'Director de cine',
-          'Productor musical', 'DJ', 'Youtuber', 'Influencer', 'Streamer', 'Publicista', 'Redactor', 'Analista de sistemas',
-          'Administrador', 'Contador', 'Economista', 'Agente inmobiliario', 'Corredor de seguros', 'Investigador', 'Detective',
-          'Perito criminal', 'Auditor', 'Consultor', 'Coach', 'Entrenador deportivo', 'Atleta profesional', 'Surfista',
-          'Futbolista', 'Luchador', 'Coreógrafo', 'Maquillador', 'Esteticista', 'Tatuador', 'Ilustrador', 'Animador',
-          'Diseñador de videojuegos', 'Guionista', 'Actor de doblaje'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.normal.celebrities]
-      },
-      hard: {
-        objects: [
-          'Estetoscopio', 'Bisturí', 'Microscopio', 'Telescopio', 'Sextante', 'Astrolabio', 'Cronómetro', 'Metrónomo', 'Afinador', 'Desfibrilador',
-          'Catapulta', 'Periscopio', 'Destilador', 'Centrífuga', 'Incubadora', 'Autoclave', 'Espectrómetro', 'Cromatógrafo', 'Calorímetro', 'Potenciómetro',
-          'Tirachinas', 'Arpón', 'Bumerán', 'Arco y flecha', 'Ballesta', 'Lanza', 'Maza', 'Hacha', 'Hoz', 'Tridente',
-          'Sandwichera', 'Deshidratador', 'Fermentador', 'Olla de cocción lenta', 'Wok', 'Tajín', 'Fondue', 'Parrilla', 'Ahumador', 'Alambique',
-          'Teodolito', 'Altímetro', 'Barómetro', 'Higrómetro', 'Anemómetro', 'Pluviómetro', 'Sismógrafo', 'Generador', 'Transformador', 'Osciloscopio'
-        ],
-        actions: [
-          'Equilibrarse en la cuerda floja', 'Tragar fuego', 'Escapar de una camisa de fuerza', 'Romper ladrillos con la mano',
-          'Caminar sobre brasas', 'Leer braille', 'Hacer señales de buceo', 'Comunicarse en lengua de señas', 'Usar código morse', 'Tocar un instrumento con los pies',
-          'Sacar un diente', 'Hacer cirugía', 'Reanimar', 'Inmovilizar una fractura', 'Aplicar un torniquete',
-          'Hacer esgrima', 'Practicar tai chi', 'Dar un golpe de karate', 'Lanzamiento de martillo', 'Lanzamiento olímpico de jabalina',
-          'Arar la tierra', 'Ordeñar una vaca', 'Esquilar una oveja', 'Herrar un caballo', 'Domar un buey',
-          'Tejer en telar', 'Soplar vidrio', 'Forjar metal', 'Moldear cerámica en torno', 'Restaurar una pintura',
-          'Despegar un avión', 'Aterrizar un helicóptero', 'Navegar un velero', 'Operar una grúa', 'Conducir un tren',
-          'Hacer rápel', 'Escalar roca', 'Tirolesa', 'Escalada libre', 'Hacer slackline',
-          'Desactivar una bomba', 'Negociar rehenes', 'Hacer paracaidismo', 'Carrera de obstáculos', 'Levantamiento de pesas olímpico'
-        ],
-        animals: [
-          'Ajolote', 'Tarsero', 'Fosa', 'Quokka', 'Numbat', 'Kakapo', 'Tuátara', 'Okapi', 'Takin', 'Saiga',
-          'Dugongo', 'Manatí', 'Narval', 'Beluga', 'Cachalote', 'Rorcual', 'Ballena jorobada', 'Delfín de río', 'Marsopa', 'Franciscana',
-          'Escorpión', 'Tarántula', 'Mamba negra', 'Taipán', 'Serpiente coral', 'Víbora', 'Cascabel', 'Boomslang', 'Calamar gigante', 'Pulpo de anillos azules',
-          'Pez globo', 'Pez piedra', 'Pez león', 'Caracol cono', 'Medusa de caja', 'Avispón asiático', 'Escarabajo bombardero', 'Mosquito tigre', 'Hormiga bala', 'Oruga de fuego',
-          'Pangolín', 'Aye-aye', 'Loris lento', 'Armadillo de tres bandas', 'Armadillo gigante', 'Oso hormiguero gigante', 'Perezoso de tres dedos', 'Erizo pigmeo', 'Musaraña elefante', 'Marta'
-        ],
-        movies: [
-          'El faro', 'Hereditary', 'Midsommar', 'La bruja', 'El sacrificio del ciervo sagrado', 'La langosta', 'Dogville', 'Anticristo',
-          'Melancolía', 'El árbol de la vida', 'Sinécdoque, Nueva York', 'Donnie Darko', 'El doble', 'Enemy', 'Ex Machina', 'Aniquilación',
-          'Coherence', 'Primer', 'La llegada', 'Moon', 'Solaris', 'Stalker', 'El espejo', 'Persona', 'El séptimo sello', 'Memento',
-          'Mulholland Drive', 'Terciopelo azul', 'Eraserhead', 'La fuente de la vida', 'El pozo', 'La plataforma', 'Climax', 'Irreversible',
-          'Enter the Void', 'El huésped', 'Oldboy', 'Memorias de un asesino', 'La doncella', 'Drive', 'Only God Forgives', 'The Master',
-          'Magnolia', 'Pozos de ambición', 'La cacería', 'Sonidos de barrio', 'Bacurau', 'El lobo detrás de la puerta', 'Una segunda madre'
-        ],
-        professions: [
-          'Neurocirujano', 'Oncólogo', 'Anestesista', 'Cardiólogo', 'Ortopedista', 'Endocrinólogo', 'Ginecólogo', 'Urólogo',
-          'Radiólogo', 'Patólogo', 'Epidemiólogo', 'Bioinformático', 'Ingeniero de datos', 'Científico de datos', 'Ingeniero aeroespacial',
-          'Ingeniero nuclear', 'Ingeniero petrolero', 'Especialista en ciberseguridad', 'Arquitecto de software', 'Ingeniero DevOps', 'Gerente de producto',
-          'Scrum Master', 'Investigador UX', 'Diseñador UX', 'Diseñador UI', 'Especialista en SEO', 'Trader', 'Analista financiero',
-          'Gestor de inversiones', 'Actuario', 'Diplomático', 'Cónsul', 'Embajador', 'Curador de museo', 'Restaurador de arte', 'Arqueólogo',
-          'Paleontólogo', 'Oceanógrafo', 'Meteorólogo', 'Piloto de combate', 'Controlador aéreo', 'Capitán de barco', 'Sommelier',
-          'Maestro cervecero', 'Chef ejecutivo', 'Perfumista', 'Diseñador automotriz', 'Ingeniero robótico', 'Especialista en IA'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.hard.celebrities]
-      }
-    };
-
-    const CHALLENGES_EN = [
-      'Act it out while sitting down', 'Act it out while crouching', 'Act it out while jumping', 'Act it out while walking in place',
-      'Act it out with one hand behind your back', 'Act it out using only one hand', 'Act it out with your arms stretched out',
-      'Act it out while spinning slowly', 'Act it out as if you were in slow motion', 'Act it out as if you were sped up (super fast)',
-      'Act it out exaggerating A LOT', 'Act it out barely moving', 'Act it out as if you were scared',
-      'Act it out as if you were very happy', 'Act it out as if you were angry', 'Act it out as if you were tired',
-      'Act it out as if you were confused', 'Act it out as if you were panicking', 'Act it out like a robot',
-      'Act it out like a cartoon character', 'Act it out like an elderly person', 'Act it out like a child',
-      'Act it out like a superhero', 'Act it out like a villain', 'Act it out like an animal',
-      'Act it out as if you were on the moon (low gravity)', 'Act it out as if you were underwater', 'Act it out as if you were invisible',
-      'Act it out as if you were giant', 'Act it out as if you were very tiny', 'You cannot use your hands',
-      'You cannot use your arms', 'You cannot move from your spot', 'You cannot repeat the same gesture', 'You cannot point at anything',
-      'You cannot use your face (no facial expressions)', 'You can only use your face (no body)', 'You must start from the end of the action',
-      'You must do everything backwards (from end to beginning)', 'You must freeze completely every 3 seconds',
-      'Act it out as if you were in an action movie', 'Act it out as if it were a comedy',
-      'Act it out as if you were in dramatic slow motion', 'Act it out as if you were in a dream',
-      'Act it out as if you were very cold', 'Act it out as if you were very hot',
-      'Act it out as if you were in the dark', 'Act it out as if you were on a stage',
-      'Act it out as if a huge audience were watching you', 'Act it out as if it were your last chance to win the game'
-    ];
-
-    const CHALLENGES_ES = [
-      'Haz la mímica sentado', 'Haz la mímica agachado', 'Haz la mímica saltando', 'Haz la mímica caminando en el lugar',
-      'Haz la mímica con una mano detrás de la espalda', 'Haz la mímica usando solo una mano', 'Haz la mímica con los brazos estirados',
-      'Haz la mímica girando lentamente', 'Haz la mímica como si estuvieras en cámara lenta', 'Haz la mímica como si estuvieras acelerado (super rápido)',
-      'Haz la mímica exagerando MUCHO', 'Haz la mímica casi sin moverte', 'Haz la mímica como si tuvieras miedo',
-      'Haz la mímica como si estuvieras muy feliz', 'Haz la mímica como si estuvieras enojado', 'Haz la mímica como si estuvieras cansado',
-      'Haz la mímica como si estuvieras confundido', 'Haz la mímica como si estuvieras en pánico', 'Haz la mímica como un robot',
-      'Haz la mímica como un personaje de caricatura', 'Haz la mímica como una persona mayor', 'Haz la mímica como un niño',
-      'Haz la mímica como un superhéroe', 'Haz la mímica como un villano', 'Haz la mímica como un animal',
-      'Haz la mímica como si estuvieras en la luna (baja gravedad)', 'Haz la mímica como si estuvieras bajo el agua', 'Haz la mímica como si fueras invisible',
-      'Haz la mímica como si fueras gigante', 'Haz la mímica como si fueras muy pequeño', 'No puedes usar las manos',
-      'No puedes usar los brazos', 'No puedes moverte del lugar', 'No puedes repetir el mismo gesto', 'No puedes señalar nada',
-      'No puedes usar la cara (sin expresiones faciales)', 'Solo puedes usar la cara (sin cuerpo)', 'Tienes que empezar por el final de la acción',
-      'Tienes que hacer todo al revés (de atrás hacia adelante)', 'Tienes que detenerte por completo cada 3 segundos',
-      'Haz la mímica como si estuvieras en una película de acción', 'Haz la mímica como si fuera una comedia',
-      'Haz la mímica como si estuvieras en cámara lenta dramática', 'Haz la mímica como si estuvieras en un sueño',
-      'Haz la mímica como si tuvieras mucho frío', 'Haz la mímica como si tuvieras mucho calor',
-      'Haz la mímica como si estuvieras en la oscuridad', 'Haz la mímica como si estuvieras en un escenario',
-      'Haz la mímica como si te estuviera mirando un público enorme', 'Haz la mímica como si fuera la última oportunidad de ganar el juego'
-    ];
-
-    const DEFAULT_WORDS_FR = {
-      easy: {
-        objects: [
-          'Ballon', 'Verre', 'Chapeau', 'Chaussure', 'Livre', 'Chaise', 'Table', 'Lit', 'Porte', 'Fenêtre',
-          'Crayon', 'Gomme', 'Sac à dos', 'Lunettes', 'Parapluie', 'Téléphone', 'Miroir', 'Brosse', 'Peigne', 'Ciseaux',
-          'Clé', 'Fourchette', 'Cuillère', 'Assiette', 'Bouteille', 'Oreiller', 'Couverture', 'Serviette', 'Savon', 'Ballon de baudruche',
-          'Poupée', 'Petite voiture', 'Pop-corn', 'Glace', 'Gâteau', 'Pomme', 'Banane', 'Raisin', 'Fleur', 'Arbre',
-          'Soleil', 'Lune', 'Étoile', 'Nuage', 'Pluie', 'Armoire', 'Placard', 'Réfrigérateur', 'Cuisinière', 'Télévision'
-        ],
-        actions: [
-          'Courir', 'Sauter', 'Dormir', 'Manger', 'Boire', 'Rire', 'Pleurer', 'Danser', 'Chanter', 'Nager',
-          'Voler', 'Marcher', "S'asseoir", 'Se lever', 'Faire un câlin', 'Jouer', 'Dessiner', 'Peindre', 'Lire', 'Écrire',
-          'Écouter', 'Crier', 'Souffler', 'Respirer', 'Tousser', 'Éternuer', 'Bâiller', 'Applaudir', 'Faire signe', 'Montrer du doigt',
-          'Attraper', 'Lancer', 'Donner un coup de pied', 'Pousser', 'Tirer', 'Ouvrir', 'Fermer', 'Se laver les mains', 'Se brosser les dents', 'Se peigner',
-          'Mettre ses chaussures', 'Enlever ses chaussures', 'Allumer la télé', 'Éteindre la lumière', 'Taper dans les mains', 'Tourner', 'Rouler', 'Embrasser', 'Sourire', 'Penser'
-        ],
-        animals: [
-          'Chien', 'Chat', 'Poisson', 'Oiseau', 'Lapin', 'Poule', 'Vache', 'Cheval', 'Cochon', 'Mouton',
-          'Canard', 'Grenouille', 'Papillon', 'Fourmi', 'Abeille', 'Araignée', 'Ver de terre', 'Limace', 'Escargot', 'Chenille',
-          'Éléphant', 'Lion', 'Girafe', 'Singe', 'Zèbre', 'Hippopotame', 'Crocodile', 'Tortue', 'Pingouin', 'Ours',
-          'Loup', 'Renard', 'Cerf', 'Écureuil', 'Souris', 'Hamster', 'Iguane', 'Perroquet', 'Toucan', 'Flamant rose',
-          'Pélican', 'Kangourou', 'Koala', 'Panda', 'Dauphin', 'Baleine', 'Poulpe', 'Crabe', 'Crevette', 'Étoile de mer'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'Le Roi lion', 'Toy Story', 'La Reine des neiges', 'Shrek', 'Harry Potter', 'Spider-Man', 'Batman', 'Superman',
-          'Jurassic Park', 'Avengers', 'Star Wars', 'Les Minions', 'Cars', 'Le Monde de Nemo', 'Vice-versa', 'Aladdin',
-          'Cendrillon', 'Blanche-Neige', 'Matrix', 'Gladiator', 'E.T.', 'King Kong', 'Godzilla', 'Black Panther', 'Iron Man',
-          'Captain America', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Pirates des Caraïbes', 'Jumanji',
-          'Mission impossible', '007', 'Rocky', 'Rambo', 'Karaté Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Monstres et Cie', 'Là-haut', 'Encanto', 'Vaiana', 'Zootopie'
-        ],
-        professions: [
-          'Médecin', 'Dentiste', 'Professeur', 'Policier', 'Pompier', 'Chauffeur', 'Cuisinier', 'Serveur', 'Boulanger', 'Facteur',
-          'Mécanicien', 'Ingénieur', 'Avocat', 'Infirmier', 'Vétérinaire', 'Pilote', 'Coiffeur', 'Barbier', 'Acteur', 'Chanteur',
-          'Danseur', 'Agent de nettoyage', 'Agent de sécurité', 'Agriculteur', 'Pêcheur', 'Électricien', 'Maçon', 'Peintre', 'Jardinier',
-          'Chauffeur de taxi', 'Livreur', 'Vendeur', 'Caissier', 'Secrétaire', 'Réceptionniste', 'Entraîneur', 'Coach sportif', 'Baby-sitter',
-          'Aide-soignant', 'Concierge', 'Éboueur', 'Pompiste', 'Chauffeur de bus', 'Chauffeur de camion', 'Guide touristique', 'Photographe',
-          'Reporter', 'Animateur radio', 'Opérateur de caisse', 'Instructeur'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.easy.celebrities]
-      },
-      normal: {
-        objects: [
-          'Ordinateur', 'Clavier', 'Radio', 'Machine à laver', 'Aspirateur', 'Mixeur', 'Batteur', 'Cafetière', 'Canapé', 'Étagère',
-          'Ventilateur', 'Climatiseur', 'Micro-ondes', 'Four', 'Évier', 'Baignoire', 'Douche', 'Valise', 'Lampe de poche', 'Jumelles',
-          'Appareil photo', 'Horloge', 'Calculatrice', 'Thermomètre', 'Balance', 'Boussole', 'Guitare acoustique', 'Piano', 'Tambour', 'Flûte',
-          'Accordéon', 'Trompette', 'Violon', 'Harmonica', 'Xylophone', 'Raquette', 'Skateboard', 'Patins à roulettes', 'Gant de boxe', 'Casque',
-          'Gilet', 'Ceinture', 'Cravate', 'Sac', 'Parapluie', 'Canne', 'Béquille', 'Fauteuil roulant', 'Lunettes de soleil', 'Casquette'
-        ],
-        actions: [
-          'Cuisiner', 'Conduire', 'Faire du vélo', 'Pêcher', 'Plonger', 'Grimper', 'Camper', 'Faire du yoga', 'Méditer', 'Photographier',
-          'Filmer', 'Peindre un tableau', 'Sculpter', 'Tricoter', 'Coudre', 'Broder', 'Jardiner', 'Arroser une plante', 'Tailler un arbre', 'Balayer',
-          'Nettoyer une fenêtre', 'Repasser', 'Plier le linge', 'Faire le lit', 'Faire la vaisselle', 'Essuyer la vaisselle', 'Éplucher un fruit', 'Râper du fromage',
-          'Pétrir du pain', 'Ramer', 'Surfer', 'Skier', 'Patiner', 'Dribbler', 'Lancer', 'Arrêter un but', 'Servir au tennis',
-          'Faire de la gymnastique', 'Applaudir', 'Faire un discours', 'Interviewer', 'Escalader un mur', 'Faire de la magie', 'Garder l’équilibre', 'Jongler',
-          'Taper au clavier', 'Téléphoner', 'Prendre un selfie', 'Payer une facture', 'Faire la queue'
-        ],
-        animals: [
-          'Aigle', 'Faucon', 'Hibou', 'Chauve-souris', 'Chameau', 'Lama', 'Alpaga', 'Bison', 'Élan', 'Coyote',
-          'Guépard', 'Léopard', 'Jaguar', 'Puma', 'Rhinocéros', 'Anaconda', 'Ornithorynque', 'Dingo', 'Cacatoès', 'Émeu',
-          'Orque', 'Requin', 'Raie', 'Calmar', 'Hippocampe', 'Oursin', 'Ara', 'Paon', 'Autruche', 'Casoar',
-          'Albatros', 'Cigogne', 'Pélican', 'Ibis', 'Héron', 'Loutre', 'Phoque', 'Morse', 'Lion de mer', 'Dugong',
-          'Chèvre de montagne', 'Bouquetin', 'Antilope', 'Gnou', 'Buffle', 'Sanglier', 'Blaireau', 'Raton laveur', 'Furet', 'Musaraigne'
-        ],
-        movies: [
-          'Interstellar', 'Inception', 'Dune', 'Fight Club', 'Pulp Fiction', 'Le Loup de Wall Street', 'Joker', 'Parasite',
-          'Gatsby le Magnifique', 'Django Unchained', 'Inglourious Basterds', 'Whiplash', 'La La Land', 'Black Swan', 'Shining',
-          'Doctor Strange', 'Les Gardiens de la Galaxie', 'Captain Marvel', 'Logan', 'John Wick', 'Matrix Reloaded', 'Matrix Revolutions',
-          'The Revenant', 'Gravity', 'Mad Max: Fury Road', 'Blade Runner 2049', 'Terminator', 'Retour vers le futur',
-          'Sixième Sens', 'The Truman Show', 'La Momie', 'Da Vinci Code', 'Anges et Démons', 'Hunger Games', 'Twilight',
-          'Ça', 'Conjuring', 'Annabelle', 'La Nonne', 'Saw', 'Get Out', 'Us', 'Split', 'Glass',
-          'Fast and Furious', 'Top Gun', 'Mission: Impossible - Fallout', 'Kingsman', 'Sherlock Holmes', 'Man of Steel'
-        ],
-        professions: [
-          'Programmeur', 'Designer', 'Architecte', 'Nutritionniste', 'Psychologue', 'Psychiatre', 'Kinésithérapeute', 'Pharmacien',
-          'Biologiste', 'Chimiste', 'Physicien', 'Géologue', 'Astronome', 'Traducteur', 'Interprète', 'Monteur vidéo', 'Réalisateur',
-          'Producteur musical', 'DJ', 'YouTubeur', 'Influenceur', 'Streamer', 'Publicitaire', 'Rédacteur', 'Analyste système',
-          'Administrateur', 'Comptable', 'Économiste', 'Agent immobilier', 'Courtier en assurances', 'Enquêteur', 'Détective',
-          'Expert criminalistique', 'Auditeur', 'Consultant', 'Coach', 'Entraîneur sportif', 'Athlète professionnel', 'Surfeur',
-          'Footballeur', 'Combattant', 'Chorégraphe', 'Maquilleur', 'Esthéticien', 'Tatoueur', 'Illustrateur', 'Animateur',
-          'Game designer', 'Scénariste', 'Doubleur'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.normal.celebrities]
-      },
-      hard: {
-        objects: [
-          'Stéthoscope', 'Scalpel', 'Microscope', 'Télescope', 'Sextant', 'Astrolabe', 'Chronomètre', 'Métronome', 'Accordeur', 'Défibrillateur',
-          'Catapulte', 'Périscope', 'Distillateur', 'Centrifugeuse', 'Incubateur', 'Autoclave', 'Spectromètre', 'Chromatographe', 'Calorimètre', 'Potentiomètre',
-          'Lance-pierre', 'Harpon', 'Boomerang', 'Arc et flèche', 'Arbalète', 'Lance', 'Masse', 'Hache', 'Faucille', 'Trident',
-          'Appareil à sandwich', 'Déshydrateur', 'Fermenteur', 'Mijoteuse', 'Wok', 'Tajine', 'Fondue', 'Barbecue', 'Fumoir', 'Alambic',
-          'Théodolite', 'Altimètre', 'Baromètre', 'Hygromètre', 'Anémomètre', 'Pluviomètre', 'Sismographe', 'Générateur', 'Transformateur', 'Oscilloscope'
-        ],
-        actions: [
-          'Tenir en équilibre sur une corde raide', 'Avaler du feu', 'S’échapper d’une camisole de force', 'Casser des briques avec la main',
-          'Marcher sur des braises', 'Lire le braille', 'Faire des signes de plongée', 'Communiquer en langue des signes', 'Utiliser le code morse', 'Jouer d’un instrument avec les pieds',
-          'Extraire une dent', 'Faire une chirurgie', 'Réanimer', 'Immobiliser une fracture', 'Appliquer un garrot',
-          'Faire de l’escrime', 'Pratiquer le tai chi', 'Faire un coup de karaté', 'Lancer le marteau', 'Lancer le javelot olympique',
-          'Labourer la terre', 'Traire une vache', 'Tondre un mouton', 'Ferrer un cheval', 'Dompter un boeuf',
-          'Tisser sur un métier', 'Souffler du verre', 'Forger du métal', 'Façonner de la céramique au tour', 'Restaurer un tableau',
-          'Faire décoller un avion', 'Faire atterrir un hélicoptère', 'Naviguer sur un voilier', 'Conduire une grue', 'Conduire un train',
-          'Faire du rappel', 'Faire de l’escalade', 'Faire de la tyrolienne', 'Faire de l’escalade libre', 'Faire du slackline',
-          'Désamorcer une bombe', 'Négocier avec des otages', 'Faire du parachutisme', 'Faire une course d’obstacles', 'Faire de l’haltérophilie olympique'
-        ],
-        animals: [
-          'Axolotl', 'Tarsier', 'Fossa', 'Quokka', 'Numbat', 'Kakapo', 'Tuatara', 'Okapi', 'Takin', 'Saïga',
-          'Dugong', 'Lamantin', 'Narval', 'Béluga', 'Cachalot', 'Rorqual', 'Baleine à bosse', 'Dauphin de rivière', 'Marsouin', 'Franciscana',
-          'Scorpion', 'Mygale', 'Mamba noir', 'Taïpan', 'Serpent corail', 'Vipère', 'Crotale', 'Boomslang', 'Calmar géant', 'Pieuvre à anneaux bleus',
-          'Poisson-globe', 'Poisson-pierre', 'Poisson-lion', 'Cône marin', 'Méduse-boîte', 'Frelon asiatique', 'Scarabée bombardier', 'Moustique tigre', 'Fourmi balle de fusil', 'Chenille de feu',
-          'Pangolin', 'Aye-aye', 'Loris lent', 'Tatou à trois bandes', 'Tatou géant', 'Fourmilier géant', 'Paresseux à trois doigts', 'Hérisson pygmée', 'Musaraigne éléphant', 'Martre des pins'
-        ],
-        movies: [
-          'The Lighthouse', 'Hérédité', 'Midsommar', 'The Witch', 'Mise à mort du cerf sacré', 'The Lobster', 'Dogville', 'Antichrist',
-          'Melancholia', 'The Tree of Life', 'Synecdoche, New York', 'Donnie Darko', 'The Double', 'Enemy', 'Ex Machina', 'Annihilation',
-          'Coherence', 'Primer', 'Premier Contact', 'Moon', 'Solaris', 'Stalker', 'Le Miroir', 'Persona', 'Le Septième Sceau', 'Memento',
-          'Mulholland Drive', 'Blue Velvet', 'Eraserhead', 'The Fountain', 'Le Puits', 'La Plateforme', 'Climax', 'Irréversible',
-          'Enter the Void', 'The Host', 'Oldboy', 'Memories of Murder', 'Mademoiselle', 'Drive', 'Only God Forgives', 'The Master',
-          'Magnolia', 'There Will Be Blood', 'La Chasse', 'Les Bruits de Recife', 'Bacurau', 'Le Loup derrière la porte', 'Une seconde mère'
-        ],
-        professions: [
-          'Neurochirurgien', 'Oncologue', 'Anesthésiste', 'Cardiologue', 'Orthopédiste', 'Endocrinologue', 'Gynécologue', 'Urologue',
-          'Radiologue', 'Pathologiste', 'Épidémiologiste', 'Bioinformaticien', 'Ingénieur de données', 'Data scientist', 'Ingénieur aérospatial',
-          'Ingénieur nucléaire', 'Ingénieur pétrolier', 'Spécialiste en cybersécurité', 'Architecte logiciel', 'Ingénieur DevOps', 'Product manager',
-          'Scrum Master', 'UX researcher', 'UX designer', 'UI designer', 'Spécialiste SEO', 'Trader', 'Analyste financier',
-          'Gestionnaire d’investissements', 'Actuaire', 'Diplomate', 'Consul', 'Ambassadeur', 'Conservateur de musée', 'Restaurateur d’art', 'Archéologue',
-          'Paléontologue', 'Océanographe', 'Météorologue', 'Pilote de chasse', 'Contrôleur aérien', 'Capitaine de navire', 'Sommelier',
-          'Maître brasseur', 'Chef exécutif', 'Parfumeur', 'Designer automobile', 'Ingénieur robotique', 'Spécialiste en IA'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.hard.celebrities]
-      }
-    };
-
-    const DEFAULT_WORDS_DE = {
-      easy: {
-        objects: [
-          'Ball', 'Becher', 'Hut', 'Schuh', 'Buch', 'Stuhl', 'Tisch', 'Bett', 'Tür', 'Fenster',
-          'Bleistift', 'Radiergummi', 'Rucksack', 'Brille', 'Regenschirm', 'Telefon', 'Spiegel', 'Bürste', 'Kamm', 'Schere',
-          'Schlüssel', 'Gabel', 'Löffel', 'Teller', 'Flasche', 'Kissen', 'Decke', 'Handtuch', 'Seife', 'Luftballon',
-          'Puppe', 'Spielzeugauto', 'Popcorn', 'Eis', 'Kuchen', 'Apfel', 'Banane', 'Trauben', 'Blume', 'Baum',
-          'Sonne', 'Mond', 'Stern', 'Wolke', 'Regen', 'Kleiderschrank', 'Schrank', 'Kühlschrank', 'Herd', 'Fernseher'
-        ],
-        actions: [
-          'Rennen', 'Springen', 'Schlafen', 'Essen', 'Trinken', 'Lachen', 'Weinen', 'Tanzen', 'Singen', 'Schwimmen',
-          'Fliegen', 'Gehen', 'Sitzen', 'Aufstehen', 'Umarmen', 'Spielen', 'Zeichnen', 'Malen', 'Lesen', 'Schreiben',
-          'Zuhören', 'Schreien', 'Pusten', 'Atmen', 'Husten', 'Niesen', 'Gähnen', 'Klatschen', 'Winken', 'Zeigen',
-          'Greifen', 'Werfen', 'Treten', 'Schieben', 'Ziehen', 'Öffnen', 'Schließen', 'Hände waschen', 'Zähne putzen', 'Kämmen',
-          'Schuhe anziehen', 'Schuhe ausziehen', 'Fernseher einschalten', 'Licht ausschalten', 'In die Hände klatschen', 'Sich drehen', 'Rollen', 'Küssen', 'Lächeln', 'Denken'
-        ],
-        animals: [
-          'Hund', 'Katze', 'Fisch', 'Vogel', 'Kaninchen', 'Huhn', 'Kuh', 'Pferd', 'Schwein', 'Schaf',
-          'Ente', 'Frosch', 'Schmetterling', 'Ameise', 'Biene', 'Spinne', 'Regenwurm', 'Nacktschnecke', 'Schnecke', 'Raupe',
-          'Elefant', 'Löwe', 'Giraffe', 'Affe', 'Zebra', 'Nilpferd', 'Krokodil', 'Schildkröte', 'Pinguin', 'Bär',
-          'Wolf', 'Fuchs', 'Hirsch', 'Eichhörnchen', 'Maus', 'Hamster', 'Leguan', 'Papagei', 'Tukan', 'Flamingo',
-          'Pelikan', 'Känguru', 'Koala', 'Panda', 'Delfin', 'Wal', 'Oktopus', 'Krabbe', 'Garnele', 'Seestern'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'Der König der Löwen', 'Toy Story', 'Die Eiskönigin', 'Shrek', 'Harry Potter', 'Spider-Man', 'Batman', 'Superman',
-          'Jurassic Park', 'Die Avengers', 'Star Wars', 'Minions', 'Cars', 'Findet Nemo', 'Alles steht Kopf', 'Aladdin',
-          'Cinderella', 'Schneewittchen', 'Matrix', 'Gladiator', 'E.T.', 'King Kong', 'Godzilla', 'Black Panther', 'Iron Man',
-          'Captain America', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Fluch der Karibik', 'Jumanji',
-          'Mission: Impossible', '007', 'Rocky', 'Rambo', 'Karate Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Die Monster AG', 'Oben', 'Encanto', 'Vaiana', 'Zoomania'
-        ],
-        professions: [
-          'Arzt', 'Zahnarzt', 'Lehrer', 'Polizist', 'Feuerwehrmann', 'Fahrer', 'Koch', 'Kellner', 'Bäcker', 'Postbote',
-          'Mechaniker', 'Ingenieur', 'Anwalt', 'Krankenpfleger', 'Tierarzt', 'Pilot', 'Friseur', 'Barbier', 'Schauspieler', 'Sänger',
-          'Tänzer', 'Reinigungskraft', 'Sicherheitskraft', 'Landwirt', 'Fischer', 'Elektriker', 'Maurer', 'Maler', 'Gärtner',
-          'Taxifahrer', 'Lieferfahrer', 'Verkäufer', 'Kassierer', 'Sekretärin', 'Empfangsmitarbeiter', 'Trainer', 'Personal Trainer', 'Babysitter',
-          'Betreuer', 'Hausmeister', 'Müllwerker', 'Tankwart', 'Busfahrer', 'Lkw-Fahrer', 'Reiseführer', 'Fotograf',
-          'Reporter', 'Radiomoderator', 'Kassenbediener', 'Ausbilder'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.easy.celebrities]
-      },
-      normal: {
-        objects: [
-          'Computer', 'Tastatur', 'Radio', 'Waschmaschine', 'Staubsauger', 'Mixer', 'Handrührgerät', 'Kaffeemaschine', 'Sofa', 'Regal',
-          'Ventilator', 'Klimaanlage', 'Mikrowelle', 'Backofen', 'Spüle', 'Badewanne', 'Dusche', 'Koffer', 'Taschenlampe', 'Fernglas',
-          'Kamera', 'Uhr', 'Taschenrechner', 'Thermometer', 'Waage', 'Kompass', 'Akustikgitarre', 'Klavier', 'Trommel', 'Flöte',
-          'Akkordeon', 'Trompete', 'Geige', 'Mundharmonika', 'Xylophon', 'Schläger', 'Skateboard', 'Rollschuhe', 'Boxhandschuh', 'Helm',
-          'Weste', 'Gürtel', 'Krawatte', 'Tasche', 'Regenschirm', 'Gehstock', 'Krücke', 'Rollstuhl', 'Sonnenbrille', 'Kappe'
-        ],
-        actions: [
-          'Kochen', 'Fahren', 'Radfahren', 'Angeln', 'Tauchen', 'Klettern', 'Zelten', 'Yoga machen', 'Meditieren', 'Fotografieren',
-          'Filmen', 'Ein Bild malen', 'Bildhauern', 'Stricken', 'Nähen', 'Sticken', 'Gärtnern', 'Pflanze gießen', 'Baum beschneiden', 'Fegen',
-          'Fenster putzen', 'Kleidung bügeln', 'Kleidung falten', 'Bett machen', 'Geschirr spülen', 'Geschirr abtrocknen', 'Obst schälen', 'Käse reiben',
-          'Brot kneten', 'Rudern', 'Surfen', 'Skifahren', 'Schlittschuhlaufen', 'Dribbeln', 'Werfen', 'Ein Tor verteidigen', 'Beim Tennis aufschlagen',
-          'Gymnastik machen', 'Applaudieren', 'Eine Rede halten', 'Interviewen', 'Eine Wand erklimmen', 'Zaubern', 'Balancieren', 'Jonglieren',
-          'Tippen', 'Telefonieren', 'Ein Selfie machen', 'Eine Rechnung bezahlen', 'Schlange stehen'
-        ],
-        animals: [
-          'Adler', 'Falke', 'Eule', 'Fledermaus', 'Kamel', 'Lama', 'Alpaka', 'Bison', 'Elch', 'Kojote',
-          'Gepard', 'Leopard', 'Jaguar', 'Puma', 'Nashorn', 'Anakonda', 'Schnabeltier', 'Dingo', 'Kakadu', 'Emu',
-          'Orca', 'Hai', 'Rochen', 'Tintenfisch', 'Seepferdchen', 'Seeigel', 'Ara', 'Pfau', 'Strauß', 'Kasuar',
-          'Albatros', 'Storch', 'Pelikan', 'Ibis', 'Reiher', 'Otter', 'Seehund', 'Walross', 'Seelöwe', 'Dugong',
-          'Bergziege', 'Steinbock', 'Antilope', 'Gnu', 'Büffel', 'Wildschwein', 'Dachs', 'Waschbär', 'Frettchen', 'Spitzmaus'
-        ],
-        movies: [
-          'Interstellar', 'Inception', 'Dune', 'Fight Club', 'Pulp Fiction', 'The Wolf of Wall Street', 'Joker', 'Parasite',
-          'Der große Gatsby', 'Django Unchained', 'Inglourious Basterds', 'Whiplash', 'La La Land', 'Black Swan', 'Shining',
-          'Doctor Strange', 'Guardians of the Galaxy', 'Captain Marvel', 'Logan', 'John Wick', 'Matrix Reloaded', 'Matrix Revolutions',
-          'The Revenant', 'Gravity', 'Mad Max: Fury Road', 'Blade Runner 2049', 'Terminator', 'Zurück in die Zukunft',
-          'The Sixth Sense', 'Die Truman Show', 'Die Mumie', 'The Da Vinci Code', 'Illuminati', 'Die Tribute von Panem', 'Twilight',
-          'Es', 'Conjuring', 'Annabelle', 'The Nun', 'Saw', 'Get Out', 'Wir', 'Split', 'Glass',
-          'Fast & Furious', 'Top Gun', 'Mission: Impossible - Fallout', 'Kingsman', 'Sherlock Holmes', 'Man of Steel'
-        ],
-        professions: [
-          'Programmierer', 'Designer', 'Architekt', 'Ernährungsberater', 'Psychologe', 'Psychiater', 'Physiotherapeut', 'Apotheker',
-          'Biologe', 'Chemiker', 'Physiker', 'Geologe', 'Astronom', 'Übersetzer', 'Dolmetscher', 'Videoeditor', 'Filmregisseur',
-          'Musikproduzent', 'DJ', 'YouTuber', 'Influencer', 'Streamer', 'Werbefachmann', 'Texter', 'Systemanalyst',
-          'Administrator', 'Buchhalter', 'Ökonom', 'Immobilienmakler', 'Versicherungsmakler', 'Ermittler', 'Detektiv',
-          'Forensiker', 'Prüfer', 'Berater', 'Coach', 'Sporttrainer', 'Profisportler', 'Surfer',
-          'Fußballspieler', 'Kämpfer', 'Choreograf', 'Visagist', 'Kosmetiker', 'Tätowierer', 'Illustrator', 'Animator',
-          'Game Designer', 'Drehbuchautor', 'Synchronsprecher'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.normal.celebrities]
-      },
-      hard: {
-        objects: [
-          'Stethoskop', 'Skalpell', 'Mikroskop', 'Teleskop', 'Sextant', 'Astrolabium', 'Stoppuhr', 'Metronom', 'Stimmgerät', 'Defibrillator',
-          'Katapult', 'Periskop', 'Destilliergerät', 'Zentrifuge', 'Inkubator', 'Autoklav', 'Spektrometer', 'Chromatograph', 'Kalorimeter', 'Potentiometer',
-          'Schleuder', 'Harpune', 'Bumerang', 'Pfeil und Bogen', 'Armbrust', 'Speer', 'Streitkolben', 'Axt', 'Sichel', 'Dreizack',
-          'Sandwichtoaster', 'Dörrautomat', 'Fermenter', 'Schongarer', 'Wok', 'Tajine', 'Fondue', 'Grill', 'Räucherofen', 'Destille',
-          'Theodolit', 'Höhenmesser', 'Barometer', 'Hygrometer', 'Anemometer', 'Regenmesser', 'Seismograph', 'Generator', 'Transformator', 'Oszilloskop'
-        ],
-        actions: [
-          'Auf dem Drahtseil balancieren', 'Feuer schlucken', 'Aus einer Zwangsjacke entkommen', 'Ziegel mit der Hand zerbrechen',
-          'Über glühende Kohlen laufen', 'Brailleschrift lesen', 'Tauchzeichen geben', 'In Gebärdensprache kommunizieren', 'Morsecode benutzen', 'Ein Instrument mit den Füßen spielen',
-          'Einen Zahn ziehen', 'Eine Operation durchführen', 'Wiederbeleben', 'Einen Bruch ruhigstellen', 'Eine Aderpresse anlegen',
-          'Fechten', 'Tai Chi üben', 'Einen Karateschlag machen', 'Hammerwerfen', 'Olympischen Speerwurf machen',
-          'Erde pflügen', 'Eine Kuh melken', 'Ein Schaf scheren', 'Ein Pferd beschlagen', 'Einen Ochsen zähmen',
-          'Am Webstuhl weben', 'Glas blasen', 'Metall schmieden', 'Keramik auf der Drehscheibe formen', 'Ein Gemälde restaurieren',
-          'Ein Flugzeug starten', 'Einen Hubschrauber landen', 'Ein Segelboot steuern', 'Einen Kran bedienen', 'Einen Zug fahren',
-          'Abseilen', 'Felsklettern', 'Seilrutsche fahren', 'Freiklettern', 'Slackline gehen',
-          'Eine Bombe entschärfen', 'Mit Geiseln verhandeln', 'Fallschirmspringen', 'Hindernislauf machen', 'Olympisches Gewichtheben'
-        ],
-        animals: [
-          'Axolotl', 'Koboldmaki', 'Fossa', 'Quokka', 'Numbat', 'Kakapo', 'Tuatara', 'Okapi', 'Takin', 'Saiga',
-          'Dugong', 'Manati', 'Narwal', 'Beluga', 'Pottwal', 'Finnwal', 'Buckelwal', 'Flussdelfin', 'Schweinswal', 'Franciscana',
-          'Skorpion', 'Vogelspinne', 'Schwarze Mamba', 'Taipan', 'Korallenschlange', 'Viper', 'Klapperschlange', 'Boomslang', 'Riesenkalmar', 'Blauringkrake',
-          'Kugelfisch', 'Steinfisch', 'Feuerfisch', 'Kegelschnecke', 'Würfelqualle', 'Asiatische Hornisse', 'Bombardierkäfer', 'Tigermücke', '24-Stunden-Ameise', 'Feuerraupe',
-          'Pangolin', 'Aye-aye', 'Plumplori', 'Dreibinden-Gürteltier', 'Riesengürteltier', 'Großer Ameisenbär', 'Dreifingerfaultier', 'Zwergigel', 'Elefantenspitzmaus', 'Baummarder'
-        ],
-        movies: [
-          'Der Leuchtturm', 'Hereditary', 'Midsommar', 'The Witch', 'The Killing of a Sacred Deer', 'The Lobster', 'Dogville', 'Antichrist',
-          'Melancholia', 'The Tree of Life', 'Synecdoche, New York', 'Donnie Darko', 'The Double', 'Enemy', 'Ex Machina', 'Auslöschung',
-          'Coherence', 'Primer', 'Arrival', 'Moon', 'Solaris', 'Stalker', 'Der Spiegel', 'Persona', 'Das siebente Siegel', 'Memento',
-          'Mulholland Drive', 'Blue Velvet', 'Eraserhead', 'The Fountain', 'Der Schacht', 'Die Plattform', 'Climax', 'Irreversibel',
-          'Enter the Void', 'The Host', 'Oldboy', 'Memories of Murder', 'Die Taschendiebin', 'Drive', 'Only God Forgives', 'The Master',
-          'Magnolia', 'There Will Be Blood', 'Die Jagd', 'Neighbouring Sounds', 'Bacurau', 'Der Wolf hinter der Tür', 'Eine zweite Mutter'
-        ],
-        professions: [
-          'Neurochirurg', 'Onkologe', 'Anästhesist', 'Kardiologe', 'Orthopäde', 'Endokrinologe', 'Gynäkologe', 'Urologe',
-          'Radiologe', 'Pathologe', 'Epidemiologe', 'Bioinformatiker', 'Dateningenieur', 'Datenwissenschaftler', 'Luft- und Raumfahrtingenieur',
-          'Nuklearingenieur', 'Erdölingenieur', 'Cybersicherheitsspezialist', 'Softwarearchitekt', 'DevOps-Ingenieur', 'Produktmanager',
-          'Scrum Master', 'UX-Forscher', 'UX-Designer', 'UI-Designer', 'SEO-Spezialist', 'Trader', 'Finanzanalyst',
-          'Investmentmanager', 'Aktuar', 'Diplomat', 'Konsul', 'Botschafter', 'Museumskurator', 'Kunstrestaurator', 'Archäologe',
-          'Paläontologe', 'Ozeanograf', 'Meteorologe', 'Kampfpilot', 'Fluglotse', 'Schiffskapitän', 'Sommelier',
-          'Braumeister', 'Küchenchef', 'Parfümeur', 'Automobildesigner', 'Robotikingenieur', 'KI-Spezialist'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.hard.celebrities]
-      }
-    };
-
-    const DEFAULT_WORDS_IT = {
-      easy: {
-        objects: [
-          'Palla', 'Bicchiere', 'Cappello', 'Scarpa', 'Libro', 'Sedia', 'Tavolo', 'Letto', 'Porta', 'Finestra',
-          'Matita', 'Gomma', 'Zaino', 'Occhiali', 'Ombrello', 'Telefono', 'Specchio', 'Spazzola', 'Pettine', 'Forbici',
-          'Chiave', 'Forchetta', 'Cucchiaio', 'Piatto', 'Bottiglia', 'Cuscino', 'Coperta', 'Asciugamano', 'Sapone', 'Palloncino',
-          'Bambola', 'Macchinina', 'Popcorn', 'Gelato', 'Torta', 'Mela', 'Banana', 'Uva', 'Fiore', 'Albero',
-          'Sole', 'Luna', 'Stella', 'Nuvola', 'Pioggia', 'Guardaroba', 'Armadio', 'Frigorifero', 'Fornello', 'Televisione'
-        ],
-        actions: [
-          'Correre', 'Saltare', 'Dormire', 'Mangiare', 'Bere', 'Ridere', 'Piangere', 'Ballare', 'Cantare', 'Nuotare',
-          'Volare', 'Camminare', 'Sedersi', 'Alzarsi', 'Abbracciare', 'Giocare', 'Disegnare', 'Dipingere', 'Leggere', 'Scrivere',
-          'Ascoltare', 'Gridare', 'Soffiare', 'Respirare', 'Tossire', 'Starnutire', 'Sbadigliare', 'Applaudire', 'Salutare con la mano', 'Indicare',
-          'Prendere', 'Lanciare', 'Calciare', 'Spingere', 'Tirare', 'Aprire', 'Chiudere', 'Lavarsi le mani', 'Lavarsi i denti', 'Pettinarsi',
-          'Mettersi le scarpe', 'Togliersi le scarpe', 'Accendere la TV', 'Spegnere la luce', 'Battere le mani', 'Girare', 'Rotolare', 'Baciare', 'Sorridere', 'Pensare'
-        ],
-        animals: [
-          'Cane', 'Gatto', 'Pesce', 'Uccellino', 'Coniglio', 'Gallina', 'Mucca', 'Cavallo', 'Maiale', 'Pecora',
-          'Anatra', 'Rana', 'Farfalla', 'Formica', 'Ape', 'Ragno', 'Lombrico', 'Lumaca senza guscio', 'Chiocciola', 'Bruco',
-          'Elefante', 'Leone', 'Giraffa', 'Scimmia', 'Zebra', 'Ippopotamo', 'Coccodrillo', 'Tartaruga', 'Pinguino', 'Orso',
-          'Lupo', 'Volpe', 'Cervo', 'Scoiattolo', 'Topo', 'Criceto', 'Iguana', 'Pappagallo', 'Tucano', 'Fenicottero',
-          'Pellicano', 'Canguro', 'Koala', 'Panda', 'Delfino', 'Balena', 'Polpo', 'Granchio', 'Gambero', 'Stella marina'
-        ],
-        movies: [
-          'Titanic', 'Avatar', 'Il Re Leone', 'Toy Story', 'Frozen', 'Shrek', 'Harry Potter', 'Spider-Man', 'Batman', 'Superman',
-          'Jurassic Park', 'Avengers', 'Star Wars', 'Minions', 'Cars', 'Alla ricerca di Nemo', 'Inside Out', 'Aladdin',
-          'Cenerentola', 'Biancaneve', 'Matrix', 'Il Gladiatore', 'E.T.', 'King Kong', 'Godzilla', 'Black Panther', 'Iron Man',
-          'Captain America', 'Thor', 'Hulk', 'Deadpool', 'Venom', 'Transformers', 'Pirati dei Caraibi', 'Jumanji',
-          'Mission: Impossible', '007', 'Rocky', 'Rambo', 'Karate Kid', 'Gremlins', 'Ghostbusters', 'Scooby-Doo', 'Madagascar',
-          'Kung Fu Panda', 'Monsters & Co.', 'Up', 'Encanto', 'Oceania', 'Zootropolis'
-        ],
-        professions: [
-          'Medico', 'Dentista', 'Insegnante', 'Poliziotto', 'Vigile del fuoco', 'Autista', 'Cuoco', 'Cameriere', 'Fornaio', 'Postino',
-          'Meccanico', 'Ingegnere', 'Avvocato', 'Infermiere', 'Veterinario', 'Pilota', 'Parrucchiere', 'Barbiere', 'Attore', 'Cantante',
-          'Ballerino', 'Addetto alle pulizie', 'Guardia di sicurezza', 'Agricoltore', 'Pescatore', 'Elettricista', 'Muratore', 'Pittore', 'Giardiniere',
-          'Tassista', 'Corriere', 'Venditore', 'Cassiere', 'Segretaria', 'Receptionist', 'Allenatore', 'Personal trainer', 'Baby-sitter',
-          'Assistente', 'Custode', 'Operatore ecologico', 'Benzinaio', 'Autista di autobus', 'Camionista', 'Guida turistica', 'Fotografo',
-          'Reporter', 'Conduttore radiofonico', 'Operatore di cassa', 'Istruttore'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.easy.celebrities]
-      },
-      normal: {
-        objects: [
-          'Computer', 'Tastiera', 'Radio', 'Lavatrice', 'Aspirapolvere', 'Frullatore', 'Sbattitore', 'Caffettiera', 'Divano', 'Scaffale',
-          'Ventilatore', 'Condizionatore', 'Microonde', 'Forno', 'Lavandino', 'Vasca da bagno', 'Doccia', 'Valigia', 'Torcia', 'Binocolo',
-          'Fotocamera', 'Orologio', 'Calcolatrice', 'Termometro', 'Bilancia', 'Bussola', 'Chitarra acustica', 'Pianoforte', 'Tamburo', 'Flauto',
-          'Fisarmonica', 'Tromba', 'Violino', 'Armonica', 'Xilofono', 'Racchetta', 'Skateboard', 'Pattini', 'Guantone da boxe', 'Casco',
-          'Gilet', 'Cintura', 'Cravatta', 'Borsa', 'Ombrello', 'Bastone', 'Stampella', 'Sedia a rotelle', 'Occhiali da sole', 'Berretto'
-        ],
-        actions: [
-          'Cucinare', 'Guidare', 'Andare in bicicletta', 'Pescare', 'Immergersi', 'Scalare', 'Campeggiare', 'Fare yoga', 'Meditare', 'Fotografare',
-          'Filmare', 'Dipingere un quadro', 'Scolpire', 'Lavorare a maglia', 'Cucire', 'Ricamare', 'Fare giardinaggio', 'Annaffiare una pianta', 'Potare un albero', 'Spazzare',
-          'Pulire una finestra', 'Stirare', 'Piegare i vestiti', 'Rifare il letto', 'Lavare i piatti', 'Asciugare i piatti', 'Sbucciare la frutta', 'Grattugiare il formaggio',
-          'Impastare il pane', 'Remare', 'Fare surf', 'Sciare', 'Pattinare', 'Dribblare', 'Lanciare', 'Parare un gol', 'Servire a tennis',
-          'Fare ginnastica', 'Applaudire', 'Fare un discorso', 'Intervistare', 'Scalare una parete', 'Fare magia', 'Stare in equilibrio', 'Fare giocoleria',
-          'Digitare', 'Telefonare', 'Fare un selfie', 'Pagare una bolletta', 'Fare la fila'
-        ],
-        animals: [
-          'Aquila', 'Falco', 'Gufo', 'Pipistrello', 'Cammello', 'Lama', 'Alpaca', 'Bisonte', 'Alce', 'Coyote',
-          'Ghepardo', 'Leopardo', 'Giaguaro', 'Puma', 'Rinoceronte', 'Anaconda', 'Ornitorinco', 'Dingo', 'Cacatua', 'Emù',
-          'Orca', 'Squalo', 'Razza', 'Calamaro', 'Cavalluccio marino', 'Riccio di mare', 'Ara', 'Pavone', 'Struzzo', 'Casuario',
-          'Albatro', 'Cicogna', 'Pellicano', 'Ibis', 'Airone', 'Lontra', 'Foca', 'Tricheco', 'Leone marino', 'Dugongo',
-          'Capra di montagna', 'Stambecco', 'Antilope', 'Gnu', 'Bufalo', 'Cinghiale', 'Tasso', 'Procione', 'Furetto', 'Toporagno'
-        ],
-        movies: [
-          'Interstellar', 'Inception', 'Dune', 'Fight Club', 'Pulp Fiction', 'The Wolf of Wall Street', 'Joker', 'Parasite',
-          'Il grande Gatsby', 'Django Unchained', 'Bastardi senza gloria', 'Whiplash', 'La La Land', 'Il cigno nero', 'Shining',
-          'Doctor Strange', 'Guardiani della Galassia', 'Captain Marvel', 'Logan', 'John Wick', 'Matrix Reloaded', 'Matrix Revolutions',
-          'Revenant', 'Gravity', 'Mad Max: Fury Road', 'Blade Runner 2049', 'Terminator', 'Ritorno al futuro',
-          'Il sesto senso', 'The Truman Show', 'La mummia', 'Il codice da Vinci', 'Angeli e demoni', 'Hunger Games', 'Twilight',
-          'It', 'The Conjuring', 'Annabelle', 'The Nun', 'Saw', 'Scappa - Get Out', 'Noi', 'Split', 'Glass',
-          'Fast & Furious', 'Top Gun', 'Mission: Impossible - Fallout', 'Kingsman', 'Sherlock Holmes', 'L’uomo d’acciaio'
-        ],
-        professions: [
-          'Programmatore', 'Designer', 'Architetto', 'Nutrizionista', 'Psicologo', 'Psichiatra', 'Fisioterapista', 'Farmacista',
-          'Biologo', 'Chimico', 'Fisico', 'Geologo', 'Astronomo', 'Traduttore', 'Interprete', 'Montatore video', 'Regista',
-          'Produttore musicale', 'DJ', 'YouTuber', 'Influencer', 'Streamer', 'Pubblicitario', 'Copywriter', 'Analista di sistemi',
-          'Amministratore', 'Contabile', 'Economista', 'Agente immobiliare', 'Broker assicurativo', 'Investigatore', 'Detective',
-          'Perito forense', 'Revisore', 'Consulente', 'Coach', 'Allenatore sportivo', 'Atleta professionista', 'Surfista',
-          'Calciatore', 'Lottatore', 'Coreografo', 'Truccatore', 'Estetista', 'Tatuatore', 'Illustratore', 'Animatore',
-          'Game designer', 'Sceneggiatore', 'Doppiatore'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.normal.celebrities]
-      },
-      hard: {
-        objects: [
-          'Stetoscopio', 'Bisturi', 'Microscopio', 'Telescopio', 'Sestante', 'Astrolabio', 'Cronometro', 'Metronomo', 'Accordatore', 'Defibrillatore',
-          'Catapulta', 'Periscopio', 'Distillatore', 'Centrifuga', 'Incubatrice', 'Autoclave', 'Spettrometro', 'Cromatografo', 'Calorimetro', 'Potenziometro',
-          'Fionda', 'Arpione', 'Boomerang', 'Arco e freccia', 'Balestra', 'Lancia', 'Mazza', 'Ascia', 'Falce', 'Tridente',
-          'Tostiera', 'Essiccatore', 'Fermentatore', 'Slow cooker', 'Wok', 'Tajine', 'Fonduta', 'Barbecue', 'Affumicatore', 'Alambicco',
-          'Teodolite', 'Altimetro', 'Barometro', 'Igrometro', 'Anemometro', 'Pluviometro', 'Sismografo', 'Generatore', 'Trasformatore', 'Oscilloscopio'
-        ],
-        actions: [
-          'Stare in equilibrio sulla corda', 'Ingoiare fuoco', 'Scappare da una camicia di forza', 'Rompere mattoni con la mano',
-          'Camminare sui carboni ardenti', 'Leggere il braille', 'Fare segnali da sub', 'Comunicare in lingua dei segni', 'Usare il codice morse', 'Suonare uno strumento con i piedi',
-          'Estrarre un dente', 'Fare un intervento chirurgico', 'Rianimare', 'Immobilizzare una frattura', 'Applicare un laccio emostatico',
-          'Fare scherma', 'Praticare tai chi', 'Dare un colpo di karate', 'Lanciare il martello', 'Lancio olimpico del giavellotto',
-          'Arare la terra', 'Mungere una mucca', 'Tosare una pecora', 'Ferrare un cavallo', 'Domare un bue',
-          'Tessere al telaio', 'Soffiare il vetro', 'Forgiare il metallo', 'Modellare la ceramica al tornio', 'Restaurare un quadro',
-          'Decollare con un aereo', 'Atterrare con un elicottero', 'Navigare su una barca a vela', 'Manovrare una gru', 'Guidare un treno',
-          'Fare rappel', 'Arrampicata su roccia', 'Fare una zipline', 'Arrampicata libera', 'Fare slackline',
-          'Disinnescare una bomba', 'Negoziare con ostaggi', 'Fare paracadutismo', 'Corsa a ostacoli', 'Sollevamento pesi olimpico'
-        ],
-        animals: [
-          'Axolotl', 'Tarsio', 'Fossa', 'Quokka', 'Numbat', 'Kakapo', 'Tuatara', 'Okapi', 'Takin', 'Saiga',
-          'Dugongo', 'Lamantino', 'Narvalo', 'Beluga', 'Capodoglio', 'Balenottera comune', 'Megattera', 'Delfino di fiume', 'Focena', 'Franciscana',
-          'Scorpione', 'Tarantola', 'Mamba nero', 'Taipan', 'Serpente corallo', 'Vipera', 'Serpente a sonagli', 'Boomslang', 'Calamaro gigante', 'Polpo dagli anelli blu',
-          'Pesce palla', 'Pesce pietra', 'Pesce leone', 'Cono marino', 'Vespa di mare', 'Calabrone asiatico', 'Coleottero bombardiere', 'Zanzara tigre', 'Formica proiettile', 'Bruco di fuoco',
-          'Pangolino', 'Aye-aye', 'Lori lento', 'Armadillo a tre fasce', 'Armadillo gigante', 'Formichiere gigante', 'Bradipo tridattilo', 'Riccio pigmeo', 'Toporagno elefante', 'Martora'
-        ],
-        movies: [
-          'The Lighthouse', 'Hereditary', 'Midsommar', 'The Witch', 'Il sacrificio del cervo sacro', 'The Lobster', 'Dogville', 'Antichrist',
-          'Melancholia', 'The Tree of Life', 'Synecdoche, New York', 'Donnie Darko', 'The Double', 'Enemy', 'Ex Machina', 'Annientamento',
-          'Coherence', 'Primer', 'Arrival', 'Moon', 'Solaris', 'Stalker', 'Lo specchio', 'Persona', 'Il settimo sigillo', 'Memento',
-          'Mulholland Drive', 'Velluto blu', 'Eraserhead', 'The Fountain', 'Il pozzo', 'The Platform', 'Climax', 'Irreversible',
-          'Enter the Void', 'The Host', 'Oldboy', 'Memorie di un assassino', 'Mademoiselle', 'Drive', 'Only God Forgives', 'The Master',
-          'Magnolia', 'Il petroliere', 'Il sospetto', 'O Som ao Redor', 'Bacurau', 'Il lupo dietro la porta', 'Una seconda madre'
-        ],
-        professions: [
-          'Neurochirurgo', 'Oncologo', 'Anestesista', 'Cardiologo', 'Ortopedico', 'Endocrinologo', 'Ginecologo', 'Urologo',
-          'Radiologo', 'Patologo', 'Epidemiologo', 'Bioinformatico', 'Ingegnere dei dati', 'Data scientist', 'Ingegnere aerospaziale',
-          'Ingegnere nucleare', 'Ingegnere petrolifero', 'Specialista in cybersicurezza', 'Architetto software', 'Ingegnere DevOps', 'Product manager',
-          'Scrum Master', 'UX researcher', 'UX designer', 'UI designer', 'Specialista SEO', 'Trader', 'Analista finanziario',
-          'Gestore di investimenti', 'Attuario', 'Diplomatico', 'Console', 'Ambasciatore', 'Curatore museale', 'Restauratore d’arte', 'Archeologo',
-          'Paleontologo', 'Oceanografo', 'Meteorologo', 'Pilota da caccia', 'Controllore di volo', 'Capitano di nave', 'Sommelier',
-          'Mastro birraio', 'Executive chef', 'Profumiere', 'Designer automobilistico', 'Ingegnere robotico', 'Specialista in IA'
-        ],
-        celebrities: [...DEFAULT_WORDS_PT.hard.celebrities]
-      }
-    };
-
-    const CHALLENGES_FR = [
-      'Fais la mime assis', 'Fais la mime accroupi', 'Fais la mime en sautant', 'Fais la mime en marchant sur place',
-      'Fais la mime avec une main dans le dos', 'Fais la mime avec une seule main', 'Fais la mime avec les bras tendus',
-      'Fais la mime en tournant lentement', 'Fais la mime comme si tu étais au ralenti', 'Fais la mime comme si tu étais accéléré (super vite)',
-      'Fais la mime en exagérant BEAUCOUP', 'Fais la mime presque sans bouger', 'Fais la mime comme si tu avais peur',
-      'Fais la mime comme si tu étais très heureux', 'Fais la mime comme si tu étais en colère', 'Fais la mime comme si tu étais fatigué',
-      'Fais la mime comme si tu étais confus', 'Fais la mime comme si tu paniquais', 'Fais la mime comme un robot',
-      'Fais la mime comme un personnage de dessin animé', 'Fais la mime comme une personne âgée', 'Fais la mime comme un enfant',
-      'Fais la mime comme un super-héros', 'Fais la mime comme un méchant', 'Fais la mime comme un animal',
-      'Fais la mime comme si tu étais sur la lune (faible gravité)', 'Fais la mime comme si tu étais sous l’eau', 'Fais la mime comme si tu étais invisible',
-      'Fais la mime comme si tu étais géant', 'Fais la mime comme si tu étais minuscule', 'Tu ne peux pas utiliser les mains',
-      'Tu ne peux pas utiliser les bras', 'Tu ne peux pas bouger de ta place', 'Tu ne peux pas répéter le même geste', 'Tu ne peux rien montrer du doigt',
-      'Tu ne peux pas utiliser le visage (aucune expression)', 'Tu ne peux utiliser que le visage (pas le corps)', 'Tu dois commencer par la fin de l’action',
-      'Tu dois tout faire à l’envers (de la fin au début)', 'Tu dois t’immobiliser complètement toutes les 3 secondes',
-      'Fais la mime comme si tu étais dans un film d’action', 'Fais la mime comme si c’était une comédie',
-      'Fais la mime comme si tu étais au ralenti dramatique', 'Fais la mime comme si tu étais dans un rêve',
-      'Fais la mime comme si tu avais très froid', 'Fais la mime comme si tu avais très chaud',
-      'Fais la mime comme si tu étais dans le noir', 'Fais la mime comme si tu étais sur scène',
-      'Fais la mime comme si un immense public te regardait', 'Fais la mime comme si c’était ta dernière chance de gagner'
-    ];
-
-    const CHALLENGES_DE = [
-      'Spiele es im Sitzen vor', 'Spiele es in der Hocke vor', 'Spiele es springend vor', 'Spiele es gehend auf der Stelle vor',
-      'Spiele es mit einer Hand hinter dem Rücken vor', 'Spiele es nur mit einer Hand vor', 'Spiele es mit ausgestreckten Armen vor',
-      'Spiele es vor, während du dich langsam drehst', 'Spiele es wie in Zeitlupe vor', 'Spiele es wie im Schnelllauf vor (super schnell)',
-      'Spiele es SEHR übertrieben vor', 'Spiele es fast ohne Bewegung vor', 'Spiele es vor, als hättest du Angst',
-      'Spiele es vor, als wärst du sehr glücklich', 'Spiele es vor, als wärst du wütend', 'Spiele es vor, als wärst du müde',
-      'Spiele es vor, als wärst du verwirrt', 'Spiele es vor, als wärst du in Panik', 'Spiele es wie ein Roboter vor',
-      'Spiele es wie eine Zeichentrickfigur vor', 'Spiele es wie eine ältere Person vor', 'Spiele es wie ein Kind vor',
-      'Spiele es wie ein Superheld vor', 'Spiele es wie ein Bösewicht vor', 'Spiele es wie ein Tier vor',
-      'Spiele es vor, als wärst du auf dem Mond (geringe Schwerkraft)', 'Spiele es vor, als wärst du unter Wasser', 'Spiele es vor, als wärst du unsichtbar',
-      'Spiele es vor, als wärst du riesig', 'Spiele es vor, als wärst du winzig klein', 'Du darfst deine Hände nicht benutzen',
-      'Du darfst deine Arme nicht benutzen', 'Du darfst dich nicht vom Platz bewegen', 'Du darfst dieselbe Geste nicht wiederholen', 'Du darfst auf nichts zeigen',
-      'Du darfst dein Gesicht nicht benutzen (keine Mimik)', 'Du darfst nur dein Gesicht benutzen (kein Körper)', 'Du musst am Ende der Aktion beginnen',
-      'Du musst alles rückwärts machen (vom Ende zum Anfang)', 'Du musst alle 3 Sekunden komplett einfrieren',
-      'Spiele es vor, als wärst du in einem Actionfilm', 'Spiele es vor, als wäre es eine Komödie',
-      'Spiele es in dramatischer Zeitlupe vor', 'Spiele es vor, als wärst du in einem Traum',
-      'Spiele es vor, als wäre dir sehr kalt', 'Spiele es vor, als wäre dir sehr heiß',
-      'Spiele es vor, als wärst du im Dunkeln', 'Spiele es vor, als wärst du auf einer Bühne',
-      'Spiele es vor, als würde dich ein riesiges Publikum beobachten', 'Spiele es vor, als wäre es deine letzte Chance zu gewinnen'
-    ];
-
-    const CHALLENGES_IT = [
-      'Fai la mimica da seduto', 'Fai la mimica accovacciato', 'Fai la mimica saltando', 'Fai la mimica camminando sul posto',
-      'Fai la mimica con una mano dietro la schiena', 'Fai la mimica usando solo una mano', 'Fai la mimica con le braccia tese',
-      'Fai la mimica girando lentamente', 'Fai la mimica come se fossi al rallentatore', 'Fai la mimica come se fossi accelerato (super veloce)',
-      'Fai la mimica esagerando MOLTO', 'Fai la mimica quasi senza muoverti', 'Fai la mimica come se avessi paura',
-      'Fai la mimica come se fossi molto felice', 'Fai la mimica come se fossi arrabbiato', 'Fai la mimica come se fossi stanco',
-      'Fai la mimica come se fossi confuso', 'Fai la mimica come se fossi nel panico', 'Fai la mimica come un robot',
-      'Fai la mimica come un personaggio dei cartoni animati', 'Fai la mimica come una persona anziana', 'Fai la mimica come un bambino',
-      'Fai la mimica come un supereroe', 'Fai la mimica come un cattivo', 'Fai la mimica come un animale',
-      'Fai la mimica come se fossi sulla luna (bassa gravità)', 'Fai la mimica come se fossi sott’acqua', 'Fai la mimica come se fossi invisibile',
-      'Fai la mimica come se fossi gigante', 'Fai la mimica come se fossi minuscolo', 'Non puoi usare le mani',
-      'Non puoi usare le braccia', 'Non puoi muoverti dal posto', 'Non puoi ripetere lo stesso gesto', 'Non puoi indicare nulla',
-      'Non puoi usare il viso (niente espressioni facciali)', 'Puoi usare solo il viso (niente corpo)', 'Devi iniziare dalla fine dell’azione',
-      'Devi fare tutto al contrario (dalla fine all’inizio)', 'Devi fermarti completamente ogni 3 secondi',
-      'Fai la mimica come se fossi in un film d’azione', 'Fai la mimica come se fosse una commedia',
-      'Fai la mimica come se fossi al rallentatore drammatico', 'Fai la mimica come se fossi in un sogno',
-      'Fai la mimica come se avessi molto freddo', 'Fai la mimica come se avessi molto caldo',
-      'Fai la mimica come se fossi al buio', 'Fai la mimica come se fossi su un palco',
-      'Fai la mimica come se ti guardasse un pubblico enorme', 'Fai la mimica come se fosse l’ultima occasione per vincere'
-    ];
 
     // Content pack schema used by the app and by future downloadable packs:
     // {
@@ -4377,17 +3680,6 @@
       return [...new Set(words)];
     }
 
-    function getLocalizedWordBank(locale = currentLanguage) {
-      const jokes = createEmptyJokeBank();
-      getEnabledPacks().forEach(pack => {
-        const localizedBank = normalizeJokeBank(pack.jokes?.[locale] || {});
-        CATEGORY_KEYS.forEach(cat => {
-          jokes[cat] = normalizeJokeList([...jokes[cat], ...localizedBank[cat]]);
-        });
-      });
-      return createLegacyWordBankFromJokeBank(jokes);
-    }
-
     function getLocalizedChallenges(locale = currentLanguage) {
       const corePack = getCorePack();
       let list = normalizeChallenges(corePack.readingChallenges?.[locale] || []);
@@ -4505,11 +3797,6 @@
       return normalizeChallenges(createCorePack().readingChallenges?.[locale] || []);
     }
 
-    function getDifficultyLabel(diff, withIcon = false) {
-      const label = t(`difficulty.${diff}`);
-      return withIcon ? `${DIFFICULTY_ICONS[diff] || ''} ${label}`.trim() : label;
-    }
-
     function getCoreJokesForCategory(category, locale = currentLanguage) {
       const bank = normalizeJokeBank(getCorePack().jokes?.[locale] || {});
       return bank[category] || [];
@@ -4522,14 +3809,6 @@
         jokes = normalizeJokeList([...jokes, ...(bank[category] || [])]);
       });
       return jokes;
-    }
-
-    function getCoreWordsForCategory(category, diff = 'easy', locale = currentLanguage) {
-      return getCoreJokesForCategory(category, locale).map(getJokeText).filter(Boolean);
-    }
-
-    function getPremiumWordsForPack(pack, diff = 'easy', locale = currentLanguage) {
-      return getPremiumJokesForPack(pack, locale).map(getJokeText).filter(Boolean);
     }
 
     function countWordsForCategoryToken(category, diff = 'easy') {
@@ -4670,6 +3949,10 @@
       });
     }
 
+    function normalizeRandomChallengeSetting(value) {
+      return typeof value === 'boolean' ? value : true;
+    }
+
     let gameState = {
       gameType: 'mime',
       mode: 'teams',
@@ -4685,38 +3968,17 @@
       currentChallenge: null,
       usedWords: [],
       timerDur: 60,
+      prepareDur: 3,
       timerInterval: null,
       memInterval: null,
+      memorizeLeft: 3,
       timerLeft: 60,
-      hintShown: false,
-      wordVisible: false,
       phase: 'preparing',
       totalTurns: 0,
       turnsDone: 0,
       leaderboardRecorded: false,
-      randomChallenge: false,
+      randomChallenge: true,
       selectedCategories: getDefaultSelectedCategories()
-    };
-
-    const DRAWING_TOOL_CONFIG = {
-      'pen-thick': { color: '#111827', width: 12 },
-      'pen-thin': { color: '#111827', width: 4 },
-      'eraser-thick': { color: '#ffffff', width: 32 },
-      'eraser-thin': { color: '#ffffff', width: 12 }
-    };
-
-    const drawingState = {
-      canvas: null,
-      ctx: null,
-      activeTool: 'pen-thick',
-      isDrawing: false,
-      lastX: 0,
-      lastY: 0
-    };
-
-    const guestDrawingState = {
-      canvas: null,
-      ctx: null
     };
 
     const multiDeviceState = {
@@ -4726,7 +3988,6 @@
       hostPeerId: '',
       hostConnection: null,
       guestConnectionStatus: 'disconnected',
-      lastGuestDrawingTurnKey: '',
       connections: [],
       assignment: '',
       sessionUrl: '',
@@ -4747,7 +4008,6 @@
     let deferredPWAInstallPrompt = null;
     let wbCat = 'trocadilhos';
     let wbPreviewPackId = '';
-    let resultAwardState = null;
     let leaderboardFilters = { mode: 'all' };
 
     // ============================================================
@@ -5143,7 +4403,6 @@
       multiDeviceState.peer = null;
       multiDeviceState.hostConnection = null;
       multiDeviceState.guestConnectionStatus = 'disconnected';
-      multiDeviceState.lastGuestDrawingTurnKey = '';
       multiDeviceState.connections = [];
       multiDeviceState.peerId = '';
       multiDeviceState.hostPeerId = '';
@@ -5234,7 +4493,6 @@
       document.getElementById('guest-current-player-name').textContent = '--';
       document.getElementById('guest-joke-card')?.classList.add('hidden');
       document.getElementById('guest-timer-card')?.classList.remove('hidden');
-      document.body.dataset.guestGameType = 'mime';
       updateGuestTimerDisplay(NaN, 1);
       goTo('home');
     }
@@ -5286,16 +4544,6 @@
       };
     }
 
-    function getDrawingSnapshot() {
-      const canvas = drawingState.canvas;
-      if (!canvas || !canvas.width || !canvas.height) return '';
-      try {
-        return canvas.toDataURL('image/png');
-      } catch (e) {
-        return '';
-      }
-    }
-
     function getGuestStatusKey(phase = 'waiting') {
       if (phase === 'preparing') return 'guestPreparing';
       if (phase === 'memorizing') return 'guestMemorizing';
@@ -5305,17 +4553,20 @@
       return 'guestWaiting';
     }
 
-    function buildHostGamePayload(options = {}) {
+    function buildHostGamePayload() {
       const hasStarted = Boolean(gameState.players.length && gameState.totalTurns);
       const phase = hasStarted ? gameState.phase : 'waiting';
       const currentPlayer = getCurrentPlayerForGuest();
+      const isMemorizing = phase === 'memorizing';
       const isPlaying = phase === 'playing';
       const showJokeOnCompanion = shouldPresentJokeOnCompanion();
       const payload = {
         phase,
         gameType: gameState.gameType,
-        timerLeft: isPlaying ? gameState.timerLeft : gameState.timerDur,
-        timerDur: gameState.timerDur,
+        timerLeft: isMemorizing
+          ? gameState.memorizeLeft
+          : (isPlaying ? gameState.timerLeft : gameState.timerDur),
+        timerDur: isMemorizing ? gameState.prepareDur : gameState.timerDur,
         currentRound: hasStarted ? gameState.currentRound : 0,
         totalRounds: hasStarted ? gameState.totalRounds : 0,
         deviceMode: showJokeOnCompanion ? 'joke' : 'timer',
@@ -5556,7 +4807,6 @@
     function renderGuestSessionState(payload) {
       multiDeviceState.lastPayload = payload;
       if (!document.getElementById('screen-guest').classList.contains('active')) goTo('guest');
-      document.body.dataset.guestGameType = payload.gameType === 'drawing' ? 'drawing' : 'mime';
       document.getElementById('guest-round-title').textContent = getGuestRoundText(payload);
       const shouldShowJoke = payload.deviceMode === 'joke' && Boolean(payload.jokeText);
       document.getElementById('guest-current-player-label').textContent = shouldShowJoke
@@ -5582,87 +4832,6 @@
       } else {
         challengeEl?.classList.add('hidden');
       }
-    }
-
-    function resizeGuestDrawingCanvas(options = {}) {
-      const { preserve = true } = options;
-      const canvas = guestDrawingState.canvas || document.getElementById('guest-drawing-canvas');
-      if (!canvas) return;
-      guestDrawingState.canvas = canvas;
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const previous = preserve && canvas.width && canvas.height ? document.createElement('canvas') : null;
-      if (previous) {
-        previous.width = canvas.width;
-        previous.height = canvas.height;
-        previous.getContext('2d').drawImage(canvas, 0, 0);
-      }
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      canvas.height = Math.max(1, Math.round(rect.height * dpr));
-      const ctx = canvas.getContext('2d');
-      guestDrawingState.ctx = ctx;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-      if (previous) {
-        ctx.drawImage(previous, 0, 0, previous.width, previous.height, 0, 0, rect.width, rect.height);
-      }
-    }
-
-    function clearGuestDrawingCanvas() {
-      resizeGuestDrawingCanvas({ preserve: false });
-    }
-
-    function drawGuestStroke(stroke) {
-      if (!stroke) return;
-      const canvas = guestDrawingState.canvas || document.getElementById('guest-drawing-canvas');
-      if (!canvas) return;
-      if (!guestDrawingState.ctx) resizeGuestDrawingCanvas();
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      const tool = DRAWING_TOOL_CONFIG[stroke.tool] || DRAWING_TOOL_CONFIG['pen-thick'];
-      const ctx = guestDrawingState.ctx;
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = tool.color;
-      ctx.lineWidth = tool.width;
-      ctx.beginPath();
-      ctx.moveTo(stroke.from.x * rect.width, stroke.from.y * rect.height);
-      ctx.lineTo(stroke.to.x * rect.width, stroke.to.y * rect.height);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    function applyGuestDrawingSnapshot(dataUrl) {
-      const canvas = guestDrawingState.canvas || document.getElementById('guest-drawing-canvas');
-      if (!canvas || !dataUrl) return;
-      resizeGuestDrawingCanvas({ preserve: false });
-      const rect = canvas.getBoundingClientRect();
-      const img = new Image();
-      img.onload = () => {
-        guestDrawingState.ctx.drawImage(img, 0, 0, rect.width, rect.height);
-      };
-      img.src = dataUrl;
-    }
-
-    function broadcastDrawingClear() {
-      broadcastMultiDeviceMessage({ type: 'drawing-clear' });
-    }
-
-    function broadcastDrawingStroke(from, to, tool) {
-      if (multiDeviceState.role !== 'host' || gameState.gameType !== 'drawing') return;
-      const rect = drawingState.canvas?.getBoundingClientRect();
-      if (!rect?.width || !rect?.height) return;
-      broadcastMultiDeviceMessage({
-        type: 'drawing-stroke',
-        stroke: {
-          from: { x: from.x / rect.width, y: from.y / rect.height },
-          to: { x: to.x / rect.width, y: to.y / rect.height },
-          tool
-        }
-      });
     }
 
     async function copyMultiDeviceLink() {
@@ -5775,7 +4944,7 @@
 
     function exportUserId() {
       const dateToken = new Date().toISOString().slice(0, 10);
-      downloadJsonFile(`mimimania-user-id-${dateToken}.json`, createUserIdBackupEnvelope());
+      downloadJsonFile(`nao-pode-rir-user-id-${dateToken}.json`, createUserIdBackupEnvelope());
       setUserIdImportStatus(t('notifications.userIdExported'), 'success');
       showNotif(t('notifications.userIdExported'));
     }
@@ -5964,7 +5133,7 @@
         wordsContainer,
         wordEntries,
         t('wordbank.packPreviewNoWords'),
-        entry => `${CATEGORY_ICONS[entry.category] || ''} ${getCategoryLabel(entry.category, { singular: true })} · ${entry.word}`.trim(),
+        entry => entry.word,
         'pack-preview-item-joke'
       );
       renderPreviewItems(
@@ -6361,6 +5530,7 @@
     function collectSettings() {
       return {
         timerDur: parseInt(document.getElementById('timer-slider').value, 10) || 60,
+        prepareDur: parseInt(document.getElementById('prepare-timer-slider').value, 10) || 3,
         soundEnabled: document.getElementById('toggle-sound').checked,
         navigationSoundEnabled: document.getElementById('toggle-navigation-sound').checked,
         gameroomMusicEnabled: document.getElementById('toggle-gameroom-music').checked,
@@ -6391,6 +5561,7 @@
     function initializeSettings() {
       const defaults = {
         timerDur: 60,
+        prepareDur: 3,
         soundEnabled: true,
         navigationSoundEnabled: true,
         gameroomMusicEnabled: true,
@@ -6411,6 +5582,7 @@
       const saved = { ...defaults, ...(rawSaved || {}), language: resolvedLanguage };
 
       document.getElementById('timer-slider').value = saved.timerDur;
+      document.getElementById('prepare-timer-slider').value = saved.prepareDur;
       document.getElementById('toggle-sound').checked = Boolean(saved.soundEnabled);
       document.getElementById('toggle-navigation-sound').checked = Boolean(saved.navigationSoundEnabled);
       document.getElementById('toggle-gameroom-music').checked = Boolean(saved.gameroomMusicEnabled);
@@ -6421,6 +5593,7 @@
       document.getElementById('theme-select').value = applyTheme(saved.theme);
       document.getElementById('language-select').value = SUPPORTED_LANGUAGES.includes(saved.language) ? saved.language : DEFAULT_LANGUAGE;
       updateTimerLabel(saved.timerDur);
+      updatePrepareTimerLabel(saved.prepareDur);
       setLanguage(saved.language || DEFAULT_LANGUAGE);
       if (shouldAutoDetectLanguage) saveSettings();
     }
@@ -6429,7 +5602,7 @@
     // LOAD LAST PLAYERS
     // ============================================================
     function loadPlayersForMode(mode) {
-      const key = mode === 'teams' ? 'mm_last_teams' : 'mm_last_ffa';
+      const key = mode === 'teams' ? LAST_TEAMS_KEY : LAST_FFA_KEY;
       const saved = localStorage.getItem(key);
       if (!saved) return;
       try {
@@ -6465,53 +5638,23 @@
     // ============================================================
     // SETUP
     // ============================================================
-    function syncDrawingBoardVisibility(options = {}) {
-      const { reset = false } = options;
-      const board = document.getElementById('drawing-board');
-      if (!board) return;
-      const shouldShow = gameState.gameType === 'drawing' && gameState.phase === 'playing';
-      board.classList.toggle('hidden', !shouldShow);
-      if (shouldShow) {
-        if (reset) {
-          resizeDrawingCanvas({ preserve: false });
-          broadcastDrawingClear();
-        } else {
-          requestAnimationFrame(() => resizeDrawingCanvas({ preserve: true }));
-        }
-      }
-    }
-
     function refreshGameTypeUI() {
-      const isDrawing = gameState.gameType === 'drawing';
-      document.body.dataset.gameType = gameState.gameType;
-      GAME_TYPES.forEach(type => {
-        const card = document.getElementById(`game-type-${type}`);
-        if (card) card.classList.toggle('selected', gameState.gameType === type);
-      });
-
       const challengeToggle = document.getElementById('random-challenge-toggle');
       const challengeWrap = document.getElementById('random-challenge-wrap');
       const challengeSub = document.getElementById('random-challenge-sub');
       if (challengeToggle) challengeToggle.disabled = false;
+      if (challengeToggle) challengeToggle.checked = Boolean(gameState.randomChallenge);
       if (challengeWrap) challengeWrap.classList.remove('is-disabled');
       if (challengeSub) challengeSub.textContent = t('setup.randomChallengeSub');
 
       const currentLabel = document.querySelector('#screen-game .current-player .cp-label');
-      if (currentLabel) currentLabel.textContent = t(isDrawing ? 'game.currentPlayerDrawingLabel' : 'game.currentPlayerLabel');
+      if (currentLabel) currentLabel.textContent = t('game.currentPlayerLabel');
       const readyEmoji = document.getElementById('game-ready-emoji');
-      if (readyEmoji) readyEmoji.textContent = isDrawing ? '✏️' : '🎭';
+      if (readyEmoji) readyEmoji.textContent = '🎭';
       const readyTitle = document.getElementById('game-ready-title');
-      if (readyTitle) readyTitle.textContent = t(isDrawing ? 'game.readyDrawingTitle' : 'game.readyTitle');
+      if (readyTitle) readyTitle.textContent = t('game.readyTitle');
       const readySub = document.getElementById('game-ready-sub');
-      if (readySub) readySub.textContent = t(isDrawing ? 'game.readyDrawingSub' : 'game.readySub');
-      const actorOnly = document.getElementById('game-only-actor-can-see');
-      if (actorOnly) actorOnly.textContent = t(isDrawing ? 'game.onlyDrawerCanSee' : 'game.onlyMimeCanSee');
-      syncDrawingBoardVisibility();
-    }
-
-    function selectGameType(type) {
-      gameState.gameType = GAME_TYPES.includes(type) ? type : 'mime';
-      refreshGameTypeUI();
+      if (readySub) readySub.textContent = t('game.readySub');
     }
 
     function updateDiffWordCount() {
@@ -6574,10 +5717,6 @@
       renderSetupPlayers();
     }
 
-    function selectDifficulty(diff) {
-      gameState.difficulty = DIFFICULTY_KEYS.includes(diff) ? diff : 'easy';
-    }
-
     function getCompanionAssignmentOptions() {
       if (gameState.mode === 'teams') {
         return [
@@ -6618,7 +5757,7 @@
     function shouldPresentJokeOnCompanion() {
       return hasActiveCompanionDevice()
         && Boolean(gameState.currentWord)
-        && ['memorizing', 'playing'].includes(gameState.phase)
+        && gameState.phase === 'playing'
         && isCurrentPlayerUsingCompanion();
     }
 
@@ -6754,7 +5893,7 @@
         mode,
         difficulty,
         rounds,
-        randomChallenge: Boolean(config?.randomChallenge),
+        randomChallenge: normalizeRandomChallengeSetting(config?.randomChallenge),
         selectedCategories,
         teams,
         players,
@@ -6786,7 +5925,7 @@
       return normalizeQuickGameConfig({
         mode: 'ffa',
         rounds: 3,
-        randomChallenge: false,
+        randomChallenge: true,
         selectedCategories: getDefaultSelectedCategories(),
         teams: { A: [], B: [] },
         players: [1, 2].map(number => getDefaultPlayerName(number)),
@@ -6836,6 +5975,7 @@
       const rounds = parseInt(document.getElementById('rounds-slider').value, 10);
       gameState.totalRounds = rounds;
       gameState.timerDur = parseInt(document.getElementById('timer-slider').value, 10) || 60;
+      gameState.prepareDur = parseInt(document.getElementById('prepare-timer-slider').value, 10) || 3;
       gameState.gameType = 'mime';
       gameState.difficulty = 'easy';
       refreshGameTypeUI();
@@ -6876,7 +6016,7 @@
       ensureValidCompanionAssignment();
       saveQuickGameConfig();
 
-      const key = gameState.mode === 'teams' ? 'mm_last_teams' : 'mm_last_ffa';
+      const key = gameState.mode === 'teams' ? LAST_TEAMS_KEY : LAST_FFA_KEY;
       const toSave = gameState.mode === 'teams'
         ? { teams: gameState.teams, teamNames: gameState.teamNames }
         : { players: gameState.players.map(player => player.name || player) };
@@ -6918,7 +6058,6 @@
         renderCurrentPlayerInfo();
       }
       if (gameState.currentWord) {
-        document.getElementById('mem-word-display').textContent = gameState.currentWord.word;
         document.getElementById('word-display').textContent = gameState.currentWord.word;
       }
       syncHostJokePresentation();
@@ -6926,38 +6065,25 @@
     }
 
     function syncHostJokePresentation() {
-      const memWord = document.getElementById('mem-word-display');
       const gameWord = document.getElementById('word-display');
-      const memChallengeEl = document.getElementById('mem-challenge-display');
-      const memChallengeTextEl = document.getElementById('mem-challenge-text');
       const gameChallengeEl = document.getElementById('game-challenge-display');
       const gameChallengeTextEl = document.getElementById('game-challenge-text');
-      const actorOnly = document.getElementById('game-only-actor-can-see');
       const onCompanion = shouldPresentJokeOnCompanion();
 
-      if (actorOnly) {
-        actorOnly.textContent = t(onCompanion ? 'game.onlyDrawerCanSee' : 'game.onlyMimeCanSee');
-      }
       if (!gameState.currentWord) {
-        if (memWord) memWord.textContent = '---';
         if (gameWord) gameWord.textContent = '---';
-        memChallengeEl?.classList.add('hidden');
         gameChallengeEl?.classList.add('hidden');
         return;
       }
 
       const displayText = onCompanion ? t('game.wordOnCompanion') : gameState.currentWord.word;
-      if (memWord) memWord.textContent = displayText;
       if (gameWord) gameWord.textContent = displayText;
 
       const shouldShowChallenge = Boolean(gameState.currentChallenge) && !onCompanion;
       if (shouldShowChallenge) {
-        if (memChallengeTextEl) memChallengeTextEl.textContent = gameState.currentChallenge;
         if (gameChallengeTextEl) gameChallengeTextEl.textContent = gameState.currentChallenge;
-        memChallengeEl?.classList.remove('hidden');
         gameChallengeEl?.classList.remove('hidden');
       } else {
-        memChallengeEl?.classList.add('hidden');
         gameChallengeEl?.classList.add('hidden');
       }
     }
@@ -6966,8 +6092,7 @@
       gameState.phase = 'preparing';
       gameState.currentWord = null;
       gameState.currentChallenge = null;
-      gameState.hintShown = false;
-      gameState.wordVisible = true;
+      gameState.memorizeLeft = gameState.prepareDur;
       gameState.timerLeft = gameState.timerDur;
       updateTimerDisplay(gameState.timerDur, gameState.timerDur);
       document.getElementById('round-display').textContent = t('dynamic.roundDisplay', {
@@ -6980,7 +6105,6 @@
       document.getElementById('playing-state').classList.add('hidden');
       syncHostJokePresentation();
       refreshGameTypeUI();
-      syncDrawingBoardVisibility();
       renderScoreMini();
       updateScoreManagerButton();
       broadcastHostGameState();
@@ -6991,9 +6115,9 @@
     // ============================================================
     function revealWord() {
       gameState.phase = 'memorizing';
+      gameState.memorizeLeft = gameState.prepareDur;
       updateScoreManagerButton();
       gameState.currentWord = pickWord();
-      gameState.wordVisible = true;
       syncHostJokePresentation();
 
       document.getElementById('preparing-state').classList.add('hidden');
@@ -7001,25 +6125,26 @@
       document.getElementById('playing-state').classList.add('hidden');
       broadcastHostGameState();
 
-      let memLeft = 5;
       const mc = document.getElementById('memCircle');
       const mn = document.getElementById('mem-num');
-      updateMemCircle(memLeft, 5, mc, mn, 213.6);
+      updateMemCircle(gameState.memorizeLeft, gameState.prepareDur, mc, mn, 213.6);
       playAlertBeep(600);
       clearInterval(gameState.memInterval);
       gameState.memInterval = setInterval(() => {
-        memLeft--;
-        updateMemCircle(memLeft, 5, mc, mn, 213.6);
-        if (memLeft > 0) playAlertBeep(memLeft <= 2 ? 700 : 500);
-        if (memLeft <= 0) {
+        gameState.memorizeLeft--;
+        updateMemCircle(gameState.memorizeLeft, gameState.prepareDur, mc, mn, 213.6);
+        if (gameState.memorizeLeft > 0) {
+          broadcastHostGameState();
+          playAlertBeep(gameState.memorizeLeft <= 2 ? 700 : 500);
+        } else {
           clearInterval(gameState.memInterval);
           document.getElementById('memorize-state').classList.add('hidden');
           document.getElementById('playing-state').classList.remove('hidden');
           gameState.phase = 'playing';
+          gameState.memorizeLeft = 0;
           updateScoreManagerButton();
           syncHostJokePresentation();
-          syncDrawingBoardVisibility({ reset: true });
-          broadcastHostGameState({ includeDrawingSnapshot: true });
+          broadcastHostGameState();
           playAlertBeep(880);
           startTimer();
         }
@@ -7027,11 +6152,11 @@
     }
 
     function updateMemCircle(left, total, circ, numEl, circumference) {
-      numEl.textContent = left;
-      circ.style.strokeDashoffset = circumference - (left / total) * circumference;
+      const safeTotal = Math.max(1, Number(total) || 1);
+      const safeLeft = Math.max(0, Number(left) || 0);
+      numEl.textContent = safeLeft;
+      circ.style.strokeDashoffset = circumference - (safeLeft / safeTotal) * circumference;
     }
-
-    function toggleWordVisibility() { }
 
     // ============================================================
     // PICK WORD / CHALLENGES
@@ -7081,7 +6206,6 @@
     function startTimer() {
       const dur = gameState.timerDur;
       gameState.timerLeft = dur;
-      gameState.hintShown = false;
       updateTimerDisplay(dur, dur);
       clearInterval(gameState.timerInterval);
       gameState.timerInterval = setInterval(() => {
@@ -7121,117 +6245,9 @@
       gameState.timerDur = parseInt(val, 10);
     }
 
-    // ============================================================
-    // DRAWING CANVAS
-    // ============================================================
-    function getDrawingPoint(event) {
-      const rect = drawingState.canvas.getBoundingClientRect();
-      return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-      };
-    }
-
-    function resizeDrawingCanvas(options = {}) {
-      const { preserve = true } = options;
-      const canvas = drawingState.canvas || document.getElementById('drawing-canvas');
-      if (!canvas) return;
-      drawingState.canvas = canvas;
-      const rect = canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-
-      const previous = preserve && canvas.width && canvas.height ? document.createElement('canvas') : null;
-      if (previous) {
-        previous.width = canvas.width;
-        previous.height = canvas.height;
-        previous.getContext('2d').drawImage(canvas, 0, 0);
-      }
-
-      const dpr = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.round(rect.width * dpr));
-      canvas.height = Math.max(1, Math.round(rect.height * dpr));
-      const ctx = canvas.getContext('2d');
-      drawingState.ctx = ctx;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, rect.width, rect.height);
-      if (previous) {
-        ctx.drawImage(previous, 0, 0, previous.width, previous.height, 0, 0, rect.width, rect.height);
-      }
-    }
-
-    function clearDrawingCanvas() {
-      resizeDrawingCanvas({ preserve: false });
-      broadcastDrawingClear();
-    }
-
-    function selectDrawingTool(tool) {
-      if (!DRAWING_TOOL_CONFIG[tool]) return;
-      drawingState.activeTool = tool;
-      document.querySelectorAll('[data-tool]').forEach(button => {
-        button.classList.toggle('selected', button.dataset.tool === tool);
-      });
-    }
-
-    function strokeDrawingLine(from, to) {
-      if (!drawingState.ctx) resizeDrawingCanvas();
-      const ctx = drawingState.ctx;
-      const tool = DRAWING_TOOL_CONFIG[drawingState.activeTool] || DRAWING_TOOL_CONFIG['pen-thick'];
-      ctx.save();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.strokeStyle = tool.color;
-      ctx.lineWidth = tool.width;
-      ctx.beginPath();
-      ctx.moveTo(from.x, from.y);
-      ctx.lineTo(to.x, to.y);
-      ctx.stroke();
-      ctx.restore();
-      broadcastDrawingStroke(from, to, drawingState.activeTool);
-    }
-
-    function startDrawing(event) {
-      if (gameState.gameType !== 'drawing' || gameState.phase !== 'playing') return;
-      event.preventDefault();
-      resizeDrawingCanvas();
-      drawingState.isDrawing = true;
-      const point = getDrawingPoint(event);
-      drawingState.lastX = point.x;
-      drawingState.lastY = point.y;
-      strokeDrawingLine(point, { x: point.x + 0.01, y: point.y + 0.01 });
-      try {
-        drawingState.canvas.setPointerCapture?.(event.pointerId);
-      } catch (e) { }
-    }
-
-    function continueDrawing(event) {
-      if (!drawingState.isDrawing) return;
-      event.preventDefault();
-      const point = getDrawingPoint(event);
-      strokeDrawingLine({ x: drawingState.lastX, y: drawingState.lastY }, point);
-      drawingState.lastX = point.x;
-      drawingState.lastY = point.y;
-    }
-
-    function stopDrawing(event) {
-      if (!drawingState.isDrawing) return;
-      drawingState.isDrawing = false;
-      try {
-        drawingState.canvas.releasePointerCapture?.(event.pointerId);
-      } catch (e) { }
-    }
-
-    function initializeDrawingCanvas() {
-      const canvas = document.getElementById('drawing-canvas');
-      if (!canvas) return;
-      drawingState.canvas = canvas;
-      canvas.addEventListener('pointerdown', startDrawing);
-      canvas.addEventListener('pointermove', continueDrawing);
-      canvas.addEventListener('pointerup', stopDrawing);
-      canvas.addEventListener('pointercancel', stopDrawing);
-      canvas.addEventListener('pointerleave', stopDrawing);
-      window.addEventListener('resize', () => resizeDrawingCanvas());
-      selectDrawingTool('pen-thick');
+    function updatePrepareTimerLabel(val) {
+      document.getElementById('prepare-timer-val').textContent = `${val}s`;
+      gameState.prepareDur = parseInt(val, 10) || 3;
     }
 
     function isAlertSoundEnabled() {
@@ -7327,18 +6343,9 @@
     // RESULT
     // ============================================================
     function resetResultGuesserPicker() {
-      resultAwardState = null;
       const nextButton = document.getElementById('result-next-turn-btn');
       if (nextButton) nextButton.disabled = false;
     }
-
-    function getFfaGuesserCandidates(actorName) {
-      return [];
-    }
-
-    function renderResultGuesserPicker(actorName, actorPoints) { }
-
-    function applyResultGuesserSelection(nextName) { }
 
     function markResult(correct, timeUp = false) {
       clearInterval(gameState.timerInterval);
@@ -7389,7 +6396,6 @@
 
       gameState.phase = 'score';
       updateScoreManagerButton();
-      syncDrawingBoardVisibility();
       renderScoreMini();
       broadcastHostGameState();
       document.getElementById('resultOverlay').classList.add('show');
@@ -7987,15 +6993,11 @@
       showNotif(t('notifications.packRemoved'));
     }
 
-    function syncWBDiffUI() { }
-
     function syncWBCatUI() {
       CATEGORY_KEYS.forEach(category =>
         document.getElementById('tab-' + category)?.classList.toggle('active', category === wbCat)
       );
     }
-
-    function switchWBDiff(diff) { }
 
     function switchWordTab(tab) {
       wbCat = tab;
@@ -8041,11 +7043,7 @@
         text.className = 'joke-entry-text';
         text.textContent = entry.word;
 
-        const head = document.createElement('div');
-        head.className = 'joke-entry-head';
-        head.textContent = getCategoryLabel(entry.category, { singular: true, withIcon: true });
-
-        card.append(head, text);
+        card.append(text);
         if (entry.editable) {
           const removeButton = document.createElement('button');
           removeButton.className = 'btn btn-ghost btn-sm joke-entry-remove';
@@ -8255,21 +7253,19 @@
           currentChallenge: null,
           usedWords: [],
           timerDur: parseInt(document.getElementById('timer-slider').value, 10) || 60,
+          prepareDur: parseInt(document.getElementById('prepare-timer-slider').value, 10) || 3,
           timerInterval: null,
           memInterval: null,
+          memorizeLeft: parseInt(document.getElementById('prepare-timer-slider').value, 10) || 3,
           timerLeft: 60,
-          hintShown: false,
-          wordVisible: false,
           phase: 'preparing',
           totalTurns: 0,
           turnsDone: 0,
           leaderboardRecorded: false,
-          randomChallenge: false,
+          randomChallenge: true,
           selectedCategories: getDefaultSelectedCategories()
         };
-        selectGameType('mime');
         selectMode('teams');
-        selectDifficulty('easy');
         goTo('setup');
         renderSetupPlayers();
       }
@@ -8287,22 +7283,6 @@
       if (key === 'ffa') addFFAPlayer();
       if (key === 'add-word') addWord();
       if (key === 'add-challenge') addChallenge();
-    }
-
-    function applyLayoutPreview(mode = 'auto') {
-      document.body.dataset.previewMode = mode;
-      localStorage.setItem('mm_layout_preview', mode);
-      const select = document.getElementById('dev-layout-preview');
-      if (select && select.value !== mode) select.value = mode;
-    }
-
-    function initializeLayoutPreview() {
-      if (!document.getElementById('dev-layout-preview')) {
-        applyLayoutPreview('auto');
-        return;
-      }
-      const saved = localStorage.getItem('mm_layout_preview') || 'auto';
-      applyLayoutPreview(saved);
     }
 
     function shouldPlayNavigationSoundForAction(action) {
@@ -8438,27 +7418,9 @@
           return;
         }
 
-        const gameTypeCard = event.target.closest('.mode-card[data-game-type]');
-        if (gameTypeCard) {
-          selectGameType(gameTypeCard.dataset.gameType);
-          return;
-        }
-
-        const difficultyCard = event.target.closest('[data-difficulty]');
-        if (difficultyCard) {
-          selectDifficulty(difficultyCard.dataset.difficulty);
-          return;
-        }
-
         const categoryCard = event.target.closest('.category-card[data-category]');
         if (categoryCard) {
           toggleCategory(categoryCard.dataset.category);
-          return;
-        }
-
-        const wbDifficultyCard = event.target.closest('[data-wb-difficulty]');
-        if (wbDifficultyCard) {
-          switchWBDiff(wbDifficultyCard.dataset.wbDifficulty);
           return;
         }
 
@@ -8514,6 +7476,11 @@
 
       document.getElementById('timer-slider').addEventListener('input', event => {
         updateTimerLabel(event.target.value);
+        saveSettings();
+      });
+
+      document.getElementById('prepare-timer-slider').addEventListener('input', event => {
+        updatePrepareTimerLabel(event.target.value);
         saveSettings();
       });
 
@@ -8589,21 +7556,12 @@
         });
       }
 
-      const previewSelect = document.getElementById('dev-layout-preview');
-      if (previewSelect) {
-        previewSelect.addEventListener('change', event => {
-          applyLayoutPreview(event.target.value);
-        });
-      }
     }
 
     // ============================================================
     // INIT
     // ============================================================
-    initializeLayoutPreview();
     initializeSettings();
     registerEventListeners();
-    selectGameType('mime');
     selectMode('teams');
-    selectDifficulty('easy');
     initializeMultiDeviceJoinFromUrl();
