@@ -293,6 +293,13 @@
 
     .wordbank-tabs {
       margin-bottom: 0;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .wordbank-tabs .tab-btn {
+      min-height: 52px;
+      white-space: normal;
+      line-height: 1.18;
     }
 
     .wordbank-list-card .words-container {
