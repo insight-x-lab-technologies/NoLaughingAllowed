@@ -450,7 +450,7 @@
           'high-contrast': 'Alto Contraste'
         },
         footer: {
-          copyPrefix: '© 2025 Não Pode Rir v0.1 · Insight X Lab Technologies'
+          copyPrefix: '© 2025 Não Pode Rir v1.0 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Time A',
@@ -899,7 +899,7 @@
           'high-contrast': 'High Contrast'
         },
         footer: {
-          copyPrefix: '© 2025 No Laughing Allowed v0.1 · Insight X Lab Technologies'
+          copyPrefix: '© 2025 No Laughing Allowed v1.0 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Team A',
@@ -1325,7 +1325,7 @@
           'high-contrast': 'Alto Contraste'
         },
         footer: {
-          copyPrefix: '© 2025 Desafío de Mímica v0.1 · Insight X Lab Technologies'
+          copyPrefix: '© 2025 Desafío de Mímica v1.0 · Insight X Lab Technologies'
         },
         teams: {
           defaultA: 'Equipo A',
@@ -1733,7 +1733,7 @@
         footerAriaLabel: 'Partager Défi du Mime'
       },
       theme: { cosmic: 'Cosmique', 'liquid-glass': 'Automne', material3: 'Printemps', 'light-mode': 'Mode clair', 'dark-mode': 'Mode sombre', 'high-contrast': 'Contraste élevé' },
-      footer: { copyPrefix: '© 2025 Défi du Mime v0.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Défi du Mime v1.0 · Insight X Lab Technologies' },
       teams: { defaultA: 'Équipe A', defaultB: 'Équipe B' },
       players: { defaultName: 'Joueur {number}' },
       dynamic: {
@@ -2118,7 +2118,7 @@
         footerAriaLabel: 'Pantomime Challenge teilen'
       },
       theme: { cosmic: 'Kosmisch', 'liquid-glass': 'Herbst', material3: 'Frühling', 'light-mode': 'Heller Modus', 'dark-mode': 'Dunkler Modus', 'high-contrast': 'Hoher Kontrast' },
-      footer: { copyPrefix: '© 2025 Pantomime Challenge v0.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Pantomime Challenge v1.0 · Insight X Lab Technologies' },
       teams: { defaultA: 'Team A', defaultB: 'Team B' },
       players: { defaultName: 'Spieler {number}' },
       dynamic: {
@@ -2503,7 +2503,7 @@
         footerAriaLabel: 'Condividi Sfida di Mimica'
       },
       theme: { cosmic: 'Cosmico', 'liquid-glass': 'Autunno', material3: 'Primavera', 'light-mode': 'Modalità chiara', 'dark-mode': 'Modalità scura', 'high-contrast': 'Alto contrasto' },
-      footer: { copyPrefix: '© 2025 Sfida di Mimica v0.1 · Insight X Lab Technologies' },
+      footer: { copyPrefix: '© 2025 Sfida di Mimica v1.0 · Insight X Lab Technologies' },
       teams: { defaultA: 'Squadra A', defaultB: 'Squadra B' },
       players: { defaultName: 'Giocatore {number}' },
       dynamic: {
