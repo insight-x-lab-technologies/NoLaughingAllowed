@@ -286,20 +286,22 @@
     .wordbank-challenges-card,
     .wordbank-install-card,
     .wordbank-pack-preview-card,
+    .wordbank-ranking-card,
     .wordbank-add-card,
     .donate-layout > .card {
       height: 100%;
     }
 
-    .wordbank-tabs {
+    .wordbank-category-grid {
       margin-bottom: 0;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .wordbank-tabs .tab-btn {
+    .wordbank-category-card {
       min-height: 52px;
-      white-space: normal;
+      display: grid;
+      place-items: center;
       line-height: 1.18;
+      overflow-wrap: anywhere;
     }
 
     .wordbank-list-card .words-container {
@@ -837,10 +839,33 @@
 
     .word-text {
       font-family: var(--font-display);
-      font-size: clamp(2rem, 6vw, 3.5rem);
+      --word-text-size: clamp(2rem, 6vw, 3.5rem);
+      font-size: var(--word-text-size);
+      line-height: 1.08;
       color: var(--accent2);
       filter: var(--word-text-shadow);
       word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .word-text-fit-lg {
+      --word-text-size: clamp(1.8rem, 4.8vw, 2.8rem);
+    }
+
+    .word-text-fit-md {
+      --word-text-size: clamp(1.55rem, 4vw, 2.35rem);
+    }
+
+    .word-text-fit-sm {
+      --word-text-size: clamp(1.3rem, 3.3vw, 1.95rem);
+    }
+
+    .word-text-fit-xs {
+      --word-text-size: clamp(1.1rem, 2.7vw, 1.55rem);
+    }
+
+    .word-text-fit-xxs {
+      --word-text-size: clamp(0.95rem, 2.2vw, 1.25rem);
     }
 
     .word-text-memorize {
@@ -935,16 +960,22 @@
     }
 
     .leaderboard-page-header {
-      align-items: flex-start;
+      align-items: center;
     }
 
     .leaderboard-title-block {
       display: grid;
       gap: 4px;
       min-width: 0;
+      flex: 1;
+    }
+
+    .leaderboard-title-block .page-title {
+      margin: 0;
     }
 
     .leaderboard-subtitle {
+      margin: 0;
       color: var(--text2);
       font-size: 0.95rem;
       font-weight: 700;
@@ -1348,6 +1379,135 @@
       text-align: center;
     }
 
+    .achievements-shell {
+      --page-shell-max-width: 1420px;
+    }
+
+    .achievements-page-header {
+      align-items: center;
+    }
+
+    .achievements-layout {
+      display: grid;
+      gap: 20px;
+    }
+
+    .achievements-summary,
+    .achievements-list-card {
+      min-width: 0;
+    }
+
+    .achievements-summary {
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .achievements-summary-stats {
+      display: grid;
+      gap: 10px;
+    }
+
+    .achievements-summary-stat {
+      display: grid;
+      gap: 4px;
+      padding: 12px 14px;
+      background: var(--surface-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .achievements-summary-label {
+      color: var(--text3);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .achievements-summary-stat strong {
+      color: var(--accent2);
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      line-height: 1.1;
+    }
+
+    .achievements-summary-note {
+      color: var(--text2);
+      font-size: 0.84rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .achievements-list-card {
+      padding: 22px;
+    }
+
+    .achievements-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+
+    .achievement-card {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--surface-border);
+      background: var(--surface-bg);
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .achievement-card.unlocked {
+      background: color-mix(in srgb, var(--accent5) 14%, var(--surface-bg));
+      border-color: color-mix(in srgb, var(--accent5) 42%, var(--surface-border));
+    }
+
+    .achievement-card.locked {
+      opacity: 0.9;
+      background: color-mix(in srgb, var(--surface-bg) 88%, transparent);
+    }
+
+    .achievement-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-xs);
+      background: var(--surface-bg-hover);
+      font-size: 1.5rem;
+    }
+
+    .achievement-card.locked .achievement-icon {
+      filter: grayscale(0.3);
+      opacity: 0.82;
+    }
+
+    .achievement-title {
+      color: var(--text);
+      font-weight: 900;
+      font-size: 1rem;
+      line-height: 1.2;
+      overflow-wrap: anywhere;
+    }
+
+    .achievement-desc {
+      color: var(--text2);
+      font-size: 0.86rem;
+      font-weight: 700;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    .achievement-meta,
+    .achievement-progress {
+      color: var(--text3);
+      font-size: 0.78rem;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
     .score-row.first {
       background: var(--score-row-first-bg);
       border-color: var(--score-row-first-border);
@@ -1463,6 +1623,7 @@
       min-height: var(--game-word-card-min-height);
       display: grid;
       align-items: center;
+      overflow: hidden;
     }
 
     .game-play-main .action-row-compact {
@@ -2264,6 +2425,82 @@
       line-height: 1.35;
     }
 
+    .joke-ranking-panel[open] {
+      display: grid;
+      gap: 14px;
+    }
+
+    .joke-ranking-summary {
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .joke-ranking-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .joke-ranking-body {
+      display: grid;
+      gap: 14px;
+    }
+
+    .joke-ranking-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .joke-ranking-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      padding: 12px 14px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-bg);
+    }
+
+    .joke-ranking-order {
+      color: var(--accent2);
+      font-weight: 900;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .joke-ranking-copy {
+      min-width: 0;
+    }
+
+    .joke-ranking-meta {
+      color: var(--text2);
+      font-size: 0.82rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .joke-ranking-text {
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .joke-ranking-empty {
+      color: var(--text3);
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .joke-ranking-actions .btn {
+      width: 100%;
+      white-space: normal;
+    }
+
     .tab-bar {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -2359,6 +2596,56 @@
       font-weight: 700;
       margin-bottom: 28px;
       text-align: center;
+    }
+
+    .result-feedback-card {
+      width: min(100%, 560px);
+      margin: 0 0 18px;
+      padding: 16px;
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius-sm);
+      background: var(--surface-bg);
+      box-shadow: var(--shadow);
+    }
+
+    .result-feedback-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--text);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .result-feedback-sub {
+      color: var(--text3);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .result-feedback-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .result-feedback-btn,
+    .result-feedback-toggle {
+      min-width: 0;
+      max-width: 100%;
+      white-space: normal;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .result-feedback-btn.selected,
+    .result-feedback-toggle.selected {
+      background: var(--tab-active-bg);
+      color: var(--text);
+      border-color: var(--accent2);
     }
 
     .result-guesser-picker {
@@ -2821,6 +3108,10 @@
       justify-content: flex-start;
     }
 
+    #screen-achievements {
+      justify-content: flex-start;
+    }
+
     .confetti-piece {
       position: fixed;
       width: 10px;
@@ -2925,12 +3216,22 @@
       }
 
       .leaderboard-page-header {
-        display: grid;
-        align-items: start;
+        display: flex;
+        align-items: center;
+      }
+
+      .achievements-page-header {
+        display: flex;
+        align-items: center;
       }
 
       .leaderboard-controls-card,
       .leaderboard-list-card {
+        padding: 16px;
+      }
+
+      .achievements-summary,
+      .achievements-list-card {
         padding: 16px;
       }
 
@@ -3006,6 +3307,10 @@
         margin: 0 0 0 6px;
       }
 
+      .achievements-grid {
+        grid-template-columns: 1fr;
+      }
+
 
     }
 
@@ -3031,6 +3336,11 @@
       }
 
       .leaderboard-layout {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .achievements-layout {
         grid-template-columns: 1fr;
         align-items: start;
       }
@@ -3071,6 +3381,11 @@
 
       .home-grid {
         grid-template-columns: minmax(360px, 620px);
+      }
+
+      .game-play-main .word-card {
+        height: clamp(var(--game-word-card-min-height), 38vh, 340px);
+        max-height: clamp(var(--game-word-card-min-height), 38vh, 340px);
       }
 
       #screen-home .home-actions-card {
@@ -3147,6 +3462,10 @@
         grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
       }
 
+      .achievements-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
       .wordbank-list-card {
         grid-column: 2;
         grid-row: 1;
@@ -3165,6 +3484,11 @@
       .wordbank-pack-preview-card {
         grid-column: 2;
         grid-row: 3;
+      }
+
+      .wordbank-ranking-card {
+        grid-column: 2;
+        grid-row: 4;
       }
 
       .settings-grid {
@@ -3208,7 +3532,17 @@
         align-items: start;
       }
 
+      .achievements-layout {
+        grid-template-columns: 300px minmax(0, 1fr);
+        align-items: start;
+      }
+
       .leaderboard-controls-card {
+        position: sticky;
+        top: 16px;
+      }
+
+      .achievements-summary {
         position: sticky;
         top: 16px;
       }
@@ -3229,5 +3563,31 @@
 
       .wordbank-list-card .words-container {
         max-height: min(66vh, 760px);
+      }
+
+      .achievements-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      .result-feedback-card {
+        padding: 14px;
+      }
+
+      .result-feedback-actions .btn {
+        flex: 1 1 calc(50% - 8px);
+      }
+
+      .result-feedback-toggle {
+        flex-basis: 100%;
+      }
+
+      .joke-ranking-item {
+        grid-template-columns: 1fr;
+      }
+
+      .joke-ranking-order {
+        margin-bottom: -2px;
       }
     }

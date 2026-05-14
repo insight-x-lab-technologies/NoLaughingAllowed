@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'mimimania-pwa-v1';
+const CACHE_VERSION = 'mimimania-pwa-v2';
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
@@ -7,6 +7,7 @@ const APP_SHELL = [
   './index.html',
   './style.css',
   './themes.css',
+  './jokes-config.js',
   './script.js',
   './manifest.webmanifest',
   './favicon.ico',

@@ -32,6 +32,18 @@
     <div class="result-emoji" id="resultEmoji">🎉</div>
     <div class="result-title" id="resultTitle" data-i18n="result.correctTitle">Riram!</div>
     <div class="result-sub" id="resultSub">+10 pontos</div>
+    <div class="result-feedback-card" id="result-feedback-card">
+      <div class="result-feedback-title" data-i18n="result.feedbackTitle">Como foi essa piada?</div>
+      <div class="result-feedback-sub" id="result-feedback-summary" data-i18n="result.feedbackSubtitle">Sua avaliação local ajuda a priorizar melhores piadas.</div>
+      <div class="result-feedback-actions" id="result-feedback-actions">
+        <button class="btn btn-ghost btn-sm result-feedback-btn" type="button" data-action="rate-joke" data-rating="1">1★</button>
+        <button class="btn btn-ghost btn-sm result-feedback-btn" type="button" data-action="rate-joke" data-rating="2">2★</button>
+        <button class="btn btn-ghost btn-sm result-feedback-btn" type="button" data-action="rate-joke" data-rating="3">3★</button>
+        <button class="btn btn-ghost btn-sm result-feedback-btn" type="button" data-action="rate-joke" data-rating="4">4★</button>
+        <button class="btn btn-ghost btn-sm result-feedback-btn" type="button" data-action="rate-joke" data-rating="5">5★</button>
+        <button class="btn btn-ghost btn-sm result-feedback-toggle" type="button" id="result-never-again-btn" data-action="toggle-never-again" data-i18n="result.neverAgain">🚫 Não repetir</button>
+      </div>
+    </div>
     <div class="action-row action-row-center action-row-wrap">
       <button class="btn btn-success btn-lg" id="result-next-turn-btn" data-action="next-turn" data-i18n="result.nextTurn">➡️ Próximo turno</button>
     </div>
@@ -60,6 +72,7 @@
             </button>
             <button class="btn btn-ghost btn-lg btn-block" data-nav="wordbank" data-i18n="home.wordBank">🧩 Conteúdo e Expansões</button>
             <button class="btn btn-ghost btn-lg btn-block" data-nav="donate" data-i18n="home.donate">❤️ Donate</button>
+            <button class="btn btn-ghost btn-lg btn-block" data-nav="achievements" data-i18n="home.achievements">🏆 Troféus</button>
             <button class="btn btn-ghost btn-lg btn-block" data-nav="leaderboard" data-i18n="home.leaderboard">🏅 Leaderboard</button>
             <button class="btn btn-ghost btn-lg btn-block" data-nav="settings" data-i18n="home.settings">⚙️ Configurações</button>
             <button class="btn btn-ghost btn-lg btn-block hidden" id="pwa-install-button" data-action="install-pwa" data-i18n="home.installOnDevice">📲 Instalar no dispositivo</button>
@@ -121,6 +134,46 @@
         <div class="card leaderboard-list-card">
           <div class="leaderboard-list" id="leaderboard-list"></div>
           <div class="leaderboard-list-footer" id="leaderboard-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ACHIEVEMENTS ========== -->
+  <div class="screen" id="screen-achievements">
+    <div class="page-shell achievements-shell">
+      <header class="page-header page-header-tight achievements-page-header">
+        <button class="btn btn-ghost btn-sm" data-nav="home" data-i18n="common.back">← Voltar</button>
+        <div class="leaderboard-title-block">
+          <h1 class="page-title" data-i18n="achievements.title">Troféus</h1>
+          <p class="leaderboard-subtitle" data-i18n="achievements.subtitle">Acompanhe suas conquistas locais e o progresso das próximas metas.</p>
+        </div>
+      </header>
+      <div class="achievements-layout">
+        <aside class="card achievements-summary">
+          <h2 class="card-title card-title-sm" data-i18n="achievements.summaryTitle">Resumo</h2>
+          <div class="achievements-summary-stats">
+            <div class="achievements-summary-stat">
+              <span class="achievements-summary-label" data-i18n="achievements.unlockedLabel">Troféus desbloqueados</span>
+              <strong id="achievements-summary-unlocked">0 / 0</strong>
+            </div>
+            <div class="achievements-summary-stat">
+              <span class="achievements-summary-label" data-i18n="achievements.matchesLabel">Partidas finalizadas</span>
+              <strong id="achievements-summary-matches">0</strong>
+            </div>
+            <div class="achievements-summary-stat">
+              <span class="achievements-summary-label" data-i18n="achievements.roundsLabel">Rodadas jogadas</span>
+              <strong id="achievements-summary-rounds">0</strong>
+            </div>
+            <div class="achievements-summary-stat">
+              <span class="achievements-summary-label" data-i18n="achievements.laughsLabel">Risadas acumuladas</span>
+              <strong id="achievements-summary-laughs">0</strong>
+            </div>
+          </div>
+          <div class="achievements-summary-note" id="achievements-summary-note" data-i18n="achievements.noneUnlocked">Nenhum troféu desbloqueado ainda</div>
+        </aside>
+        <div class="card achievements-list-card">
+          <div id="achievements-grid" class="achievements-grid"></div>
         </div>
       </div>
     </div>
@@ -504,14 +557,9 @@
       <div class="wordbank-layout">
         <div class="wordbank-sidebar">
           <div class="card wordbank-filter-card">
-            <!-- CATEGORY TABS -->
-            <div class="tab-bar wordbank-tabs">
-              <button class="tab-btn active" data-wb-tab="trocadilhos" id="tab-trocadilhos" data-i18n="category.trocadilhos.tab">🤹 Trocadilhos</button>
-              <button class="tab-btn" data-wb-tab="tiozao" id="tab-tiozao" data-i18n="category.tiozao.tab">🧢 Tiozão</button>
-              <button class="tab-btn" data-wb-tab="cotidiano" id="tab-cotidiano" data-i18n="category.cotidiano.tab">🏠 Cotidiano</button>
-              <button class="tab-btn" data-wb-tab="familia" id="tab-familia" data-i18n="category.familia.tab">💬 Família</button>
-              <button class="tab-btn" data-wb-tab="escola_trabalho" id="tab-escola_trabalho" data-i18n="category.escola_trabalho.tab">📚 Escola & Trabalho</button>
-              <button class="tab-btn" data-wb-tab="absurdo" id="tab-absurdo" data-i18n="category.absurdo.tab">🤪 Absurdo</button>
+            <div class="toggle-label mb-xs" data-i18n="setup.categoriesLabel">Categorias Disponíveis</div>
+            <div class="category-grid wordbank-category-grid" id="wordbank-category-selection">
+              <!-- Categories will be populated by JS -->
             </div>
           </div>
 
@@ -596,6 +644,20 @@
             <div class="installed-packs-title" data-i18n="wordbank.packPreviewChallengesTitle">Desafios de leitura do pack</div>
             <div id="pack-preview-challenges" class="pack-preview-list"></div>
           </div>
+        </div>
+
+        <div class="card wordbank-ranking-card">
+          <details class="joke-ranking-panel" open>
+            <summary class="joke-ranking-summary">
+              <span class="card-title card-title-sm card-title-inline" data-i18n="wordbank.jokeRankingTitle">🏅 Ranking local de piadas</span>
+            </summary>
+            <div class="joke-ranking-body">
+              <div id="joke-ranking-list" class="joke-ranking-list"></div>
+              <div class="joke-ranking-actions">
+                <button class="btn btn-danger btn-sm" type="button" data-action="clear-joke-stats" data-i18n="wordbank.clearJokeStats">Limpar estatísticas de piadas</button>
+              </div>
+            </div>
+          </details>
         </div>
       </div>
     </div>
@@ -869,6 +931,8 @@
 
   <script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="jokes-config.js"></script>
+  <script src="translations.js"></script>
   <script src="script.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

@@ -1,0 +1,47 @@
+
+[2026-05-10 22:52:13] Iniciando NoLaughingAllowed na porta 8080
+Diretório servido: /home/administrator/Projetos/Pessoal/NoLaughingAllowed/src
+
+[2026-05-11 21:17:08] Iniciando NoLaughingAllowed na porta 8080
+Diretório servido: /home/administrator/Projetos/Pessoal/NoLaughingAllowed/src
+192.168.68.121 - - [11/May/2026 21:17:15] "GET / HTTP/1.1" 304 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /css/themes.css HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /assets/images/v1_default_logo.png HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /css/style.css HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /assets/images/v1_default_HomeJet.png HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /assets/images/v1_default_gameplay_jet.png HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/i18n.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/themes.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/progression.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/storage.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/missions.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/audio.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/gameplay.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/achievements.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:15] code 404, message File not found
+192.168.68.121 - - [11/May/2026 21:17:15] "GET /js/application.js HTTP/1.1" 404 -
+192.168.68.121 - - [11/May/2026 21:17:16] "GET /favicon.ico HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET / HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET /themes.css HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET /style.css HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET /script.js HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET /manifest.webmanifest HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:21] "GET /assets/background/cosmic_desktop_bg_home.png HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:22] "GET /favicon.ico HTTP/1.1" 200 -
+192.168.68.121 - - [11/May/2026 21:17:26] "GET /assets/background/cosmic_desktop_bg_app.png HTTP/1.1" 200 -
+
+[2026-05-11 21:24:26] Iniciando NoLaughingAllowed na porta 8080
+Diretório servido: /mnt/userdata/Projetos/Pessoal/NoLaughingAllowed/src
