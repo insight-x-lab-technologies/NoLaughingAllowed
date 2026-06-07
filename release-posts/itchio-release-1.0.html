@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Laughing Allowed 1.0 is live on itch.io</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #151116;
+      --panel: #211820;
+      --panel-strong: #2e2029;
+      --ink: #fff6df;
+      --muted: #d9c7ad;
+      --accent: #ffcf3f;
+      --accent-strong: #ff8a3d;
+      --line: rgba(255, 246, 223, 0.18);
+      --shadow: rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 12% 16%, rgba(255, 207, 63, 0.18), transparent 28%),
+        radial-gradient(circle at 82% 8%, rgba(255, 138, 61, 0.16), transparent 26%),
+        linear-gradient(135deg, #151116 0%, #201725 54%, #101417 100%);
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+
+    .release-post {
+      width: min(980px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 56px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(120deg, rgba(255, 207, 63, 0.12), transparent 36%),
+        linear-gradient(180deg, var(--panel-strong), var(--panel));
+      box-shadow: 0 24px 70px var(--shadow);
+      padding: clamp(28px, 5vw, 64px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -8% -38% auto;
+      width: 360px;
+      height: 360px;
+      border: 46px solid rgba(255, 207, 63, 0.12);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 18px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 999px;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(2.4rem, 7vw, 5.6rem);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 720px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: clamp(1.08rem, 2vw, 1.35rem);
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      padding: 12px 18px;
+      color: #18110b;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      font-weight: 900;
+      text-decoration: none;
+      box-shadow: 0 12px 30px rgba(255, 138, 61, 0.26);
+    }
+
+    .button.secondary {
+      color: var(--ink);
+      background: rgba(255, 246, 223, 0.08);
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(250px, 0.65fr);
+      gap: 22px;
+      margin-top: 24px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(33, 24, 32, 0.9);
+      padding: clamp(22px, 3vw, 32px);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: clamp(1.35rem, 3vw, 2rem);
+      line-height: 1.08;
+    }
+
+    p {
+      margin: 0 0 16px;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    li {
+      position: relative;
+      padding-left: 28px;
+      color: var(--muted);
+    }
+
+    li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.64em;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(255, 207, 63, 0.12);
+    }
+
+    .facts {
+      gap: 10px;
+    }
+
+    .fact {
+      display: grid;
+      gap: 2px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+    }
+
+    .fact:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .label {
+      color: var(--accent);
+      font-size: 0.74rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .value {
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    @media (max-width: 760px) {
+      .release-post {
+        width: min(100% - 20px, 980px);
+        padding-top: 18px;
+      }
+
+      .hero,
+      .card {
+        padding: 22px;
+      }
+
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <article class="release-post">
+    <header class="hero">
+      <p class="eyebrow">Version 1.0 release</p>
+      <h1>No Laughing Allowed is now live on itch.io</h1>
+      <p class="lead">
+        The first full release of No Laughing Allowed is here: a quick party game about reading jokes out loud,
+        keeping a straight face, and turning every round into a tiny comedy showdown.
+      </p>
+      <div class="cta-row">
+        <!-- Replace # with the final itch.io project URL before publishing. -->
+        <a class="button" href="#" target="_blank" rel="noopener">Play on itch.io</a>
+        <a class="button secondary" href="#what-is-included">See what is included</a>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="card">
+        <h2>The straight-face challenge begins</h2>
+        <p>
+          In No Laughing Allowed, one player reads a joke while the other side tries not to laugh.
+          If the delivery breaks them, the reader scores. If everyone holds it together, silence wins the moment.
+        </p>
+        <p>
+          It is built for fast rounds, loud reactions, and groups that enjoy turning simple jokes into dramatic
+          performances. You can play locally on one screen or use a connected companion device to make the active
+          reader's turn feel more theatrical.
+        </p>
+      </section>
+
+      <aside class="card">
+        <h2>At a glance</h2>
+        <div class="facts">
+          <div class="fact">
+            <span class="label">Release</span>
+            <span class="value">1.0</span>
+          </div>
+          <div class="fact">
+            <span class="label">Genre</span>
+            <span class="value">Party game</span>
+          </div>
+          <div class="fact">
+            <span class="label">Modes</span>
+            <span class="value">Teams and 1 vs 1</span>
+          </div>
+          <div class="fact">
+            <span class="label">Best for</span>
+            <span class="value">Friends, families, and casual game nights</span>
+          </div>
+        </div>
+      </aside>
+
+      <section class="card" id="what-is-included">
+        <h2>What is included in 1.0</h2>
+        <ul>
+          <li>Quick matches with automatic rounds, scoring, winners, and final results.</li>
+          <li>Teams mode and 1 vs 1 mode for different group sizes.</li>
+          <li>Joke categories, reading challenges, and configurable timers.</li>
+          <li>Companion-device play for showing the joke or timer on a second screen.</li>
+          <li>Custom jokes, extra content pack support, local joke ratings, and a leaderboard.</li>
+          <li>Language, sound, music, appearance, and installable app-style settings.</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>Thank you</h2>
+        <p>
+          This release is a milestone for the project, and I am excited to finally share it on itch.io.
+          If you try it with your group, feedback is welcome. Tell me what made people laugh, what needs tuning,
+          and what kinds of joke packs you would like to see next.
+        </p>
+        <p>
+          Thanks for playing, and good luck keeping a straight face.
+        </p>
+      </section>
+    </main>
+
+    <p class="footer-note">
+      No Laughing Allowed 1.0 by Insight X Lab Game Studios.
+    </p>
+  </article>
+</body>
+</html>
